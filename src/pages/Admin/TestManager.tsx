@@ -171,7 +171,7 @@ const TestManager = () => {
     };
 
     const downloadTemplate = () => {
-        window.open("http://localhost:3000/api/admin/template", "_blank");
+        window.open("/api/admin/template", "_blank");
     };
 
     return (

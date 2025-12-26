@@ -3,9 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { db } from './db.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -256,15 +256,7 @@ app.get('/api/slides', async (req, res) => {
     res.json(db.data.slides);
 });
 
-// app.get('*', (req, res) => {
-//     const indexPath = path.resolve(__dirname, '../dist/index.html');
-//     console.log("Serving:", indexPath);
-//     if (fs.existsSync(indexPath)) {
-//         res.sendFile(indexPath);
-//     } else {
-//         res.status(404).send("Index file not found");
-//     }
-// });
+
 
 // Template Download
 app.get('/api/admin/template', (req, res) => {
@@ -272,6 +264,16 @@ app.get('/api/admin/template', (req, res) => {
     res.header('Content-Type', 'text/csv');
     res.attachment('tests_template.csv');
     res.send(csvContent);
+});
+
+app.get('*', (req, res) => {
+    const indexPath = path.resolve(__dirname, '../dist/index.html');
+    console.log("Serving:", indexPath);
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send("Index file not found");
+    }
 });
 
 app.listen(PORT, () => {
