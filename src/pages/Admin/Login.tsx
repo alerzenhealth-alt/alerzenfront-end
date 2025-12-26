@@ -13,7 +13,7 @@ const AdminLogin = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch("/api/login", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
