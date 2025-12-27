@@ -2,13 +2,20 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm ci --omit=dev
 
-COPY server/ server/
-COPY dist/ dist/
+# Install dependencies (including devDependencies for build)
+RUN npm ci
 
+# Copy source code
+COPY . .
 
+# Build the frontend application
+RUN npm run build
+
+# Expose the application port
 EXPOSE 3000
 
-CMD ["node", "server/index.js"]
+# Start the server
+CMD ["npm", "start"]

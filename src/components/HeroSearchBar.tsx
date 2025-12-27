@@ -231,7 +231,7 @@ const HeroSearchBar = () => {
   return (
     <div className="w-full relative z-50">
       {/* Glass Search Bar */}
-      <div className="relative flex items-center glass rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-16 border border-white/40">
+      <div className="relative flex items-center glass rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-16 border border-white/40 z-[101]">
         <div className="flex-1 flex items-center h-full">
           <Search className="w-5 h-5 text-gray-500 ml-6" />
           <Input
@@ -278,54 +278,54 @@ const HeroSearchBar = () => {
             Search
           </Button>
         </div>
-      </div>
 
-      {/* Glass Suggestions Dropdown */}
-      {showSuggestions && filteredTests.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-3 glass-card rounded-2xl shadow-2xl z-50 overflow-hidden animate-fade-in border border-white/50">
-          <ul className="py-2 max-h-[400px] overflow-y-auto custom-scrollbar">
-            {filteredTests.map((test, index) => {
-              const hasDiscount = test.originalPrice && test.originalPrice > test.price;
-              const discountPercentage = hasDiscount
-                ? Math.round(((test.originalPrice! - test.price) / test.originalPrice!) * 100)
-                : 0;
+        {/* Glass Suggestions Dropdown */}
+        {showSuggestions && filteredTests.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-3 glass-card !bg-white rounded-2xl shadow-2xl z-[100] overflow-hidden animate-fade-in border border-white/50">
+            <ul className="py-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+              {filteredTests.map((test, index) => {
+                const hasDiscount = test.originalPrice && test.originalPrice > test.price;
+                const discountPercentage = hasDiscount
+                  ? Math.round(((test.originalPrice! - test.price) / test.originalPrice!) * 100)
+                  : 0;
 
-              return (
-                <li key={index}>
-                  <button
-                    className="w-full px-5 py-3.5 text-left hover:bg-primary/5 transition-all flex items-center justify-between gap-3 group"
-                    onMouseDown={() => addToCart(test)}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <span className="text-gray-800 font-medium group-hover:text-primary transition-colors block truncate">
-                        {test.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground truncate block opacity-70">
-                        {test.category}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        {hasDiscount && (
-                          <div className="flex items-center justify-end gap-1.5">
-                            <span className="text-xs text-gray-400 line-through">₹{test.originalPrice}</span>
-                            <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
-                              {discountPercentage}% OFF
-                            </span>
-                          </div>
-                        )}
-                        <span className="text-sm font-bold text-primary block">₹{test.price}</span>
+                return (
+                  <li key={index}>
+                    <button
+                      className="w-full px-5 py-3.5 text-left hover:bg-primary/5 transition-all flex items-center justify-between gap-3 group"
+                      onMouseDown={() => addToCart(test)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <span className="text-gray-800 font-medium group-hover:text-primary transition-colors block truncate">
+                          {test.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate block opacity-70">
+                          {test.category}
+                        </span>
                       </div>
-                    </div>
-                    <Plus className="w-5 h-5 text-gray-400 group-hover:text-primary group-hover:scale-110 transition-all flex-shrink-0" />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          {hasDiscount && (
+                            <div className="flex items-center justify-end gap-1.5">
+                              <span className="text-xs text-gray-400 line-through">₹{test.originalPrice}</span>
+                              <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
+                                {discountPercentage}% OFF
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-sm font-bold text-primary block">₹{test.price}</span>
+                        </div>
+                      </div>
+                      <Plus className="w-5 h-5 text-gray-400 group-hover:text-primary group-hover:scale-110 transition-all flex-shrink-0" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
 
       {/* Extracted Tests UI - Glass */}
       {showResults && extractedTests.length > 0 && (

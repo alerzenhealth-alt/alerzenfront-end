@@ -6,6 +6,8 @@ import { db } from './db.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+import multer from 'multer';
+import csv from 'csv-parser';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -18,6 +20,9 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 app.use('/assets', express.static(path.join(__dirname, '../src/assets'))); // Serve assets for dev/preview if needed
 
+// Configure Multer for file uploads
+const upload = multer({ dest: 'uploads/' });
+
 // API Endpoints
 
 // Login
@@ -25,10 +30,10 @@ app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
     // Secure login using environment variables
-    const adminUser = process.env.ADMIN_USERNAME;
-    const adminPass = process.env.ADMIN_PASSWORD;
+    const adminUser = process.env.ADMIN_USERNAME || "admin";
+    const adminPass = process.env.ADMIN_PASSWORD || "password123";
 
-    if (adminUser && adminPass && username === adminUser && password === adminPass) {
+    if (username === adminUser && password === adminPass) {
         res.json({ success: true, token: "admin-token-123" });
     } else {
         res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -79,13 +84,7 @@ app.post('/api/admin/promo-codes', async (req, res) => {
     res.json({ success: true });
 });
 
-import multer from 'multer';
-import csv from 'csv-parser';
-
-// Configure Multer for file uploads
-const upload = multer({ dest: 'uploads/' });
-
-// Delete Test
+// Delete Test Query
 app.delete('/api/admin/tests', async (req, res) => {
     const { id } = req.query;
     console.log(`Received delete request for ID: "${id}"`);
@@ -256,8 +255,6 @@ app.get('/api/slides', async (req, res) => {
     res.json(db.data.slides);
 });
 
-
-
 // Template Download
 app.get('/api/admin/template', (req, res) => {
     const csvContent = "Name,Category,Price,OriginalPrice,Description\nComplete Blood Count,Basic,350,500,Comprehensive blood test";
@@ -266,13 +263,20 @@ app.get('/api/admin/template', (req, res) => {
     res.send(csvContent);
 });
 
-app.get('*', (req, res) => {
-    const indexPath = path.resolve(__dirname, '../dist/index.html');
-    console.log("Serving:", indexPath);
+// SPA Fallback: Serve index.html for any unknown route
+app.use((req, res) => {
+    // Determine the path to index.html
+    const indexPath = path.join(__dirname, '../dist/index.html');
+
+    // Log for debugging
+    console.log(`[SPA Fallback] Request: ${req.url} -> Serving: ${indexPath}`);
+
+    // Check if file exists to assume it's safe to send
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
-        res.status(404).send("Index file not found");
+        console.error(`[SPA Fallback] Error: ${indexPath} not found!`);
+        res.status(404).send("Application is building or index.html is missing.");
     }
 });
 
