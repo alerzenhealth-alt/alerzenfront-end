@@ -101,6 +101,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          key: string
+          value: string | null
+          is_active: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          key: string
+          value?: string | null
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          key?: string
+          value?: string | null
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

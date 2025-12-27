@@ -227,3 +227,20 @@ All colors MUST be HSL.
     background: radial-gradient(circle, rgba(190, 44, 45, 0.1) 0%, rgba(190, 44, 45, 0) 70%);
   }
 }
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+}

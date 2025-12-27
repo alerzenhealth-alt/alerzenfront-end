@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image } from "lucide-react";
+import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings } from "lucide-react";
 import TestManager from "./TestManager";
 import PackageManager from "./PackageManager";
 import PromoCodeManager from "./PromoCodeManager";
+import SettingsManager from "./SettingsManager";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -60,6 +61,13 @@ const AdminDashboard = () => {
                     >
                         <Image className="w-4 h-4 mr-2" /> Slideshow
                     </Button>
+                    <Button
+                        variant={activeTab === "settings" ? "secondary" : "ghost"}
+                        className="w-full justify-start font-medium"
+                        onClick={() => setActiveTab("settings")}
+                    >
+                        <Settings className="w-4 h-4 mr-2" /> Site Settings
+                    </Button>
                 </nav>
 
                 <Button variant="outline" className="mt-auto flex items-center gap-2 text-destructive hover:text-destructive" onClick={handleLogout}>
@@ -73,6 +81,7 @@ const AdminDashboard = () => {
                 {activeTab === "packages" && <PackageManager />}
                 {activeTab === "promos" && <PromoCodeManager />}
                 {activeTab === "slides" && <div className="text-center text-gray-500 mt-20">Slideshow Manager Coming Soon</div>}
+                {activeTab === "settings" && <SettingsManager />}
             </div>
         </div>
     );
