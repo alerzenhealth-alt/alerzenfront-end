@@ -37,7 +37,7 @@ export const AnnouncementBanner = () => {
     if (loading || !isActive || !text) return null;
 
     return (
-        <div className="bg-primary text-white py-2 overflow-hidden relative z-50 shadow-md">
+        <div className="bg-primary text-white py-2 overflow-hidden relative z-40 shadow-md mt-16">
             <div className="animate-marquee whitespace-nowrap font-medium text-sm md:text-base">
                 {text}
                 <span className="mx-8">•</span>
