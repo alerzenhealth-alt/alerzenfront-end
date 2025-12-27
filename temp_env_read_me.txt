@@ -1,0 +1,7 @@
+VITE_SUPABASE_PROJECT_ID="vlxkevdkmpwskrjdktkx"
+VITE_SUPABASE_PUBLISHABLE_KEY="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc2NjY4MTE2MCwiZXhwIjo0OTIyMzU0NzYwLCJyb2xlIjoiYW5vbiJ9.uXImolqqV9hjyEjSunpVKxv-ocLz_pJg1IBZvqSdVic"
+VITE_SUPABASE_URL="http://supabasekong-wkgc4sws88gog48s8o8kksc4.72.61.241.157.sslip.io"
+
+# Admin Credentials
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="new_secure_password123"
