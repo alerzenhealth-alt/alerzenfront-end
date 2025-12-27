@@ -11,10 +11,13 @@ import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 import PopularPackages from "@/components/PopularPackages";
 
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      <AnnouncementBanner />
       <Hero />
       <PopularPackages />
 

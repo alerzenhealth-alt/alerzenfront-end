@@ -18,15 +18,12 @@ import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
-import { AnnouncementBanner } from "@/components/AnnouncementBanner";
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AnnouncementBanner />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/tests" element={<Tests />} />
