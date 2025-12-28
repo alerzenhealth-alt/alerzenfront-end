@@ -35,10 +35,21 @@ const PackageManager = () => {
     const [selectedTests, setSelectedTests] = useState<string[]>([]);
     const [description, setDescription] = useState("");
 
+    // Search & Filter State
+    const [searchTerm, setSearchTerm] = useState("");
+    const [promoCodes, setPromoCodes] = useState<{ id: string, code: string }[]>([]);
+    const [selectedPromoCode, setSelectedPromoCode] = useState<string>("");
+
     useEffect(() => {
         fetchPackages();
         fetchTests();
+        fetchPromoCodes();
     }, []);
+
+    const fetchPromoCodes = async () => {
+        const { data } = await supabase.from('promo_codes').select('id, code').eq('active', true);
+        if (data) setPromoCodes(data);
+    };
 
     const fetchPackages = async () => {
         try {
@@ -57,7 +68,8 @@ const PackageManager = () => {
                     category: p.category || "Package",
                     price: Number(p.price),
                     originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
-                    description: p.description || ""
+                    description: p.description || "",
+                    promoCode: p.promo_code || ""
                 }));
                 setPackages(formattedPackages);
             }
@@ -112,7 +124,8 @@ const PackageManager = () => {
             description: finalDescription,
             popular: true,
             deliveryTime: "24-48 hours",
-            reportTime: "6-12 hours"
+            reportTime: "6-12 hours",
+            promo_code: selectedPromoCode || null
         };
 
         try {
@@ -148,16 +161,13 @@ const PackageManager = () => {
         }
     };
 
-    const handleEditPackage = (pkg: HealthPackage) => {
+    const handleEditPackage = (pkg: HealthPackage & { promoCode?: string }) => {
         setPackageName(pkg.name);
         setPackagePrice(pkg.price);
         setOriginalPrice(pkg.originalPrice || 0);
-        setDescription(pkg.description?.split(". Includes:")[0] || pkg.description || ""); // Try to strip auto-generated part for cleaner editing
-
-        // Note: Re-selecting individual tests from a flattened description string is hard/impossible 
-        // without a separate relational table. For now, we leave selectedTests empty or let user re-select.
-        // A better approach later would be a 'package_tests' junction table.
+        setDescription(pkg.description?.split(". Includes:")[0] || pkg.description || "");
         setSelectedTests([]);
+        setSelectedPromoCode(pkg.promoCode || "");
 
         setEditingId(pkg.id);
         setIsCreating(true);
@@ -185,6 +195,8 @@ const PackageManager = () => {
         setSelectedTests([]);
         setDescription("");
         setEditingId(null);
+        setSelectedPromoCode("");
+        setSearchTerm("");
     };
 
     const toggleTestSelection = (testId: string) => {
@@ -198,6 +210,10 @@ const PackageManager = () => {
         const test = availableTests.find(t => t.id === testId);
         return sum + (test?.price || 0);
     }, 0);
+
+    const filteredTests = availableTests.filter(test =>
+        test.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="space-y-6">
@@ -226,10 +242,18 @@ const PackageManager = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Select Tests to Include (Total Value: ₹{calculatedTotal})</Label>
+                            <div className="flex justify-between items-center">
+                                <Label>Select Tests to Include (Total Value: ₹{calculatedTotal})</Label>
+                                <Input
+                                    placeholder="Search tests..."
+                                    className="max-w-[200px] h-8 text-xs"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
                             <p className="text-xs text-muted-foreground mb-2">Selected tests will be listed in the package description.</p>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 border rounded-md bg-white">
-                                {availableTests.map(test => (
+                                {filteredTests.map(test => (
                                     <div key={test.id} className="flex items-center space-x-2">
                                         <Checkbox
                                             id={`test-${test.id}`}
@@ -244,7 +268,7 @@ const PackageManager = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <Label>Selling Price</Label>
                                 <Input type="number" value={packagePrice} onChange={(e) => setPackagePrice(parseFloat(e.target.value) || 0)} />
@@ -252,6 +276,19 @@ const PackageManager = () => {
                             <div className="space-y-2">
                                 <Label>Original Price (MRP)</Label>
                                 <Input type="number" value={originalPrice} onChange={(e) => setOriginalPrice(parseFloat(e.target.value) || 0)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Auto-Apply Promo Code</Label>
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={selectedPromoCode}
+                                    onChange={(e) => setSelectedPromoCode(e.target.value)}
+                                >
+                                    <option value="">None</option>
+                                    {promoCodes.map(promo => (
+                                        <option key={promo.id} value={promo.code}>{promo.code}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 

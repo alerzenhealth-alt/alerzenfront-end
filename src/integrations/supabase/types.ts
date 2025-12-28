@@ -29,6 +29,7 @@ export type Database = {
           sampleType: string | null
           fastingRequired: boolean | null
           reportTime: string | null
+          promo_code: string | null
           created_at: string
         }
         Insert: {
@@ -45,6 +46,7 @@ export type Database = {
           sampleType?: string | null
           fastingRequired?: boolean | null
           reportTime?: string | null
+          promo_code?: string | null
           created_at?: string
         }
         Update: {
@@ -61,6 +63,7 @@ export type Database = {
           sampleType?: string | null
           fastingRequired?: boolean | null
           reportTime?: string | null
+          promo_code?: string | null
           created_at?: string
         }
         Relationships: []
