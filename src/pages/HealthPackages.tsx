@@ -116,7 +116,14 @@ const HealthPackages = () => {
   const popularTests = allTests.filter(test => test.popular).slice(0, 6);
 
   const handleBookNow = (test: LabTest) => {
-    setSelectedTest(test);
+    let bookingTest = { ...test };
+    // If promo was applied for display, the 'price' is already discounted.
+    // We need to revert to the pre-discount price (stored in originalPrice during our mapping)
+    // so that BookingCheckout can apply the discount calculation correctly without double-dipping.
+    if (test.promoApplied && test.originalPrice) {
+      bookingTest.price = test.originalPrice;
+    }
+    setSelectedTest(bookingTest);
     setIsCheckoutOpen(true);
   };
 

@@ -107,7 +107,14 @@ const PopularPackages = () => {
     }, []);
 
     const handleBookNow = (pkg: LabTest) => {
-        setSelectedPackage(pkg);
+        let bookingPkg = { ...pkg };
+        // If promo was applied for display, the 'price' is already discounted.
+        // We need to revert to the pre-discount price (stored in originalPrice during our mapping)
+        // so that BookingCheckout can apply the discount calculation correctly without double-dipping.
+        if (pkg.promoApplied && pkg.originalPrice) {
+            bookingPkg.price = pkg.originalPrice;
+        }
+        setSelectedPackage(bookingPkg);
         setIsCheckoutOpen(true);
     };
 
