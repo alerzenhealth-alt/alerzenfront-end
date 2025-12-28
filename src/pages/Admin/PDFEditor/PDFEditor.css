@@ -1,0 +1,322 @@
+/* PDF Editor Scoped Styles */
+#pdf-editor-page {
+    /* Ensure it takes full available height in the admin layout */
+    height: calc(100vh - 4rem);
+    /* Adjust based on admin header height */
+    overflow: hidden;
+    background-color: #0f172a;
+    color: white;
+    /* Default text color for dark mode feeling */
+}
+
+#pdf-editor-page .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+#pdf-editor-page .app-header {
+    height: 60px;
+    /* Reduced specific height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    background: rgba(30, 41, 59, 0.7);
+    /* translucent slate */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+#pdf-editor-page .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#pdf-editor-page .logo-icon {
+    background: #3b82f6;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+#pdf-editor-page .logo-section h1 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+}
+
+#pdf-editor-page .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background-color: #020617;
+    /* Very dark slate */
+}
+
+/* Empty State */
+#pdf-editor-page .empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+}
+
+#pdf-editor-page .upload-card {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass effect */
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#pdf-editor-page .upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    padding: 2rem;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    color: #94a3b8;
+}
+
+#pdf-editor-page .upload-zone:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+    color: white;
+}
+
+#pdf-editor-page .upload-icon {
+    color: #3b82f6;
+}
+
+/* Editor Workspace */
+#pdf-editor-page .editor-workspace {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+#pdf-editor-page .sidebar {
+    width: 300px;
+    background: #1e293b;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+#pdf-editor-page .sidebar h2 {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+#pdf-editor-page .tool-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#pdf-editor-page .tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    color: #e2e8f0;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+    width: 100%;
+    justify-content: flex-start;
+    font-size: 0.9rem;
+}
+
+#pdf-editor-page .tool-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+#pdf-editor-page .preview-area {
+    flex: 1;
+    background: #0f172a;
+    overflow: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+#pdf-editor-page .tool-control {
+    margin-bottom: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+#pdf-editor-page .tool-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+#pdf-editor-page .input-group {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+}
+
+#pdf-editor-page .text-input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    font-family: inherit;
+    outline: none;
+    padding-left: 0.5rem;
+}
+
+#pdf-editor-page .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+#pdf-editor-page .btn-primary:hover {
+    background-color: #2563eb;
+}
+
+#pdf-editor-page .btn-primary:disabled {
+    background-color: #1e40af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#pdf-editor-page .range-input {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+#pdf-editor-page .sub-controls {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#pdf-editor-page .sub-label {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+#pdf-editor-page .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+#pdf-editor-page .toggle-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.375rem;
+    padding: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+#pdf-editor-page .toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 0.4rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+}
+
+#pdf-editor-page .toggle-btn.active {
+    background: #3b82f6;
+    color: white;
+}
+
+#pdf-editor-page .preview-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #333;
+}
+
+#pdf-editor-page .selected-file-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+#pdf-editor-page .icon-btn {
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pdf-editor-page .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Draggable Items Styles */
+.draggable-item {
+    border: 2px dashed rgba(59, 130, 246, 0.5);
+}
+
+.draggable-item:hover {
+    border-color: #3b82f6;
+}
