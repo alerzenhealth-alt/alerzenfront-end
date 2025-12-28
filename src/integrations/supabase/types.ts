@@ -30,6 +30,7 @@ export type Database = {
           fastingRequired: boolean | null
           reportTime: string | null
           promo_code: string | null
+          apply_promo_to_display_price: boolean | null
           created_at: string
         }
         Insert: {
@@ -47,6 +48,7 @@ export type Database = {
           fastingRequired?: boolean | null
           reportTime?: string | null
           promo_code?: string | null
+          apply_promo_to_display_price?: boolean | null
           created_at?: string
         }
         Update: {
@@ -64,6 +66,7 @@ export type Database = {
           fastingRequired?: boolean | null
           reportTime?: string | null
           promo_code?: string | null
+          apply_promo_to_display_price?: boolean | null
           created_at?: string
         }
         Relationships: []

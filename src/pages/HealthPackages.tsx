@@ -22,6 +22,8 @@ interface LabTest {
   description?: string;
   popular?: boolean;
   promo_code?: string;
+  apply_promo_to_display_price?: boolean;
+  promoApplied?: boolean;
 }
 
 const HealthPackages = () => {
@@ -34,10 +36,17 @@ const HealthPackages = () => {
   const [detailsTest, setDetailsTest] = useState<LabTest | null>(null);
 
   useEffect(() => {
-    const fetchTests = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // Fetch promo codes
+        const { data: promoData } = await supabase
+          .from('promo_codes')
+          .select('*')
+          .eq('active', true);
+
+        // Fetch packages
+        const { data: testData, error } = await supabase
           .from('tests')
           .select('*')
           .eq('category', 'Package') // Filter ONLY Packages
@@ -49,18 +58,43 @@ const HealthPackages = () => {
           return;
         }
 
-        if (data) {
-          const formattedTests: LabTest[] = data.map(test => ({
-            id: test.id,
-            name: test.name,
-            category: test.category || "General",
-            price: Number(test.price),
-            originalPrice: test.originalPrice ? Number(test.originalPrice) : undefined,
-            deliveryTime: test.deliveryTime || "24-48 hours",
-            description: test.description || "",
-            popular: test.popular || false,
-            promo_code: test.promo_code || undefined
-          }));
+        if (testData) {
+          const formattedTests: LabTest[] = testData.map(test => {
+            let finalPrice = Number(test.price);
+            let finalOriginalPrice = test.originalPrice ? Number(test.originalPrice) : undefined;
+            let isPromoApplied = false;
+
+            if (test.apply_promo_to_display_price && test.promo_code && promoData) {
+              const promo = promoData.find(p => p.code === test.promo_code);
+              if (promo) {
+                let discountAmount = 0;
+                if (promo.discountType === 'percentage') {
+                  discountAmount = (finalPrice * promo.discountValue) / 100;
+                } else {
+                  discountAmount = promo.discountValue;
+                }
+
+                if (!promo.min_order_value || finalPrice >= promo.min_order_value) {
+                  finalOriginalPrice = finalPrice;
+                  finalPrice = Math.max(0, finalPrice - discountAmount);
+                  isPromoApplied = true;
+                }
+              }
+            }
+
+            return {
+              id: test.id,
+              name: test.name,
+              category: test.category || "General",
+              price: Math.round(finalPrice),
+              originalPrice: finalOriginalPrice ? Math.round(finalOriginalPrice) : undefined,
+              deliveryTime: test.deliveryTime || "24-48 hours",
+              description: test.description || "",
+              popular: test.popular || false,
+              promo_code: test.promo_code || undefined,
+              promoApplied: isPromoApplied
+            };
+          });
           setAllTests(formattedTests);
         }
       } catch (err) {
@@ -70,7 +104,7 @@ const HealthPackages = () => {
       }
     };
 
-    fetchTests();
+    fetchData();
   }, []);
 
   const filteredTests = allTests.filter(test =>
@@ -207,6 +241,12 @@ const HealthPackages = () => {
                           <div className="text-sm font-semibold text-gray-400 line-through">₹{test.originalPrice}</div>
                         )}
                         <div className="text-2xl font-extrabold text-primary">₹{test.price}</div>
+                        {test.promoApplied && (
+                          <p className="text-[10px] text-green-600 font-bold uppercase tracking-wide flex items-center gap-1 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                            Promo Applied
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -291,6 +331,12 @@ const HealthPackages = () => {
                           <div className="text-xs font-semibold text-gray-400 line-through">₹{test.originalPrice}</div>
                         )}
                         <div className="text-xl font-bold text-gray-900">₹{test.price}</div>
+                        {test.promoApplied && (
+                          <p className="text-[10px] text-green-600 font-bold uppercase tracking-wide flex items-center gap-1 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                            Promo Applied
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -352,6 +398,12 @@ const HealthPackages = () => {
                     <span className="text-sm text-gray-400 line-through">₹{detailsTest.originalPrice}</span>
                   )}
                 </div>
+                {detailsTest?.promoApplied && (
+                  <p className="text-xs text-green-600 font-bold uppercase tracking-wide flex items-center gap-1 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                    Promo Code Applied
+                  </p>
+                )}
               </div>
               <Button
                 className="bg-primary hover:bg-primary-light text-white shadow-lg shadow-primary/25"

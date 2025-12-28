@@ -24,6 +24,8 @@ interface LabTest {
     description?: string;
     popular?: boolean;
     promo_code?: string;
+    apply_promo_to_display_price?: boolean;
+    promoApplied?: boolean;
 }
 
 const PopularPackages = () => {
@@ -35,30 +37,63 @@ const PopularPackages = () => {
     const [detailsPackage, setDetailsPackage] = useState<LabTest | null>(null);
 
     useEffect(() => {
-        const fetchPackages = async () => {
+        const fetchData = async () => {
             try {
-                // Fetch tests that are categorized as 'Package' OR are popular
-                // Adjust logic as needed. Assuming 'Package' category for explicit packages.
-                const { data, error } = await supabase
+                // Fetch promo codes first
+                const { data: promoData } = await supabase
+                    .from('promo_codes')
+                    .select('*')
+                    .eq('active', true);
+
+                // Fetch tests
+                const { data: testData, error } = await supabase
                     .from('tests')
                     .select('*')
                     .ilike('category', '%Package%')
-                    .order('price', { ascending: true }); // Show affordable packages first?
+                    .order('price', { ascending: true });
 
                 if (error) throw error;
 
-                if (data) {
-                    const formattedPackages: LabTest[] = data.map(test => ({
-                        id: test.id,
-                        name: test.name,
-                        category: test.category || "Package",
-                        price: Number(test.price),
-                        originalPrice: test.originalPrice ? Number(test.originalPrice) : undefined,
-                        deliveryTime: test.deliveryTime || "24 hrs",
-                        description: test.description || "",
-                        popular: test.popular || false,
-                        promo_code: test.promo_code || undefined
-                    }));
+                if (testData) {
+                    const formattedPackages: LabTest[] = testData.map(test => {
+                        let finalPrice = Number(test.price);
+                        let finalOriginalPrice = test.originalPrice ? Number(test.originalPrice) : undefined;
+                        let isPromoApplied = false;
+
+                        if (test.apply_promo_to_display_price && test.promo_code && promoData) {
+                            const promo = promoData.find(p => p.code === test.promo_code);
+                            if (promo) {
+                                // Calculate discount
+                                let discountAmount = 0;
+                                if (promo.discountType === 'percentage') {
+                                    discountAmount = (finalPrice * promo.discountValue) / 100;
+                                } else {
+                                    discountAmount = promo.discountValue;
+                                }
+
+                                // Apply if min order value logic passes (usually packages are high value, but good to check)
+                                if (!promo.min_order_value || finalPrice >= promo.min_order_value) {
+                                    // Set new values
+                                    finalOriginalPrice = finalPrice; // Old selling price becomes "original"
+                                    finalPrice = Math.max(0, finalPrice - discountAmount);
+                                    isPromoApplied = true;
+                                }
+                            }
+                        }
+
+                        return {
+                            id: test.id,
+                            name: test.name,
+                            category: test.category || "Package",
+                            price: Math.round(finalPrice),
+                            originalPrice: finalOriginalPrice ? Math.round(finalOriginalPrice) : undefined,
+                            deliveryTime: test.deliveryTime || "24 hrs",
+                            description: test.description || "",
+                            popular: test.popular || false,
+                            promo_code: test.promo_code || undefined,
+                            promoApplied: isPromoApplied
+                        };
+                    });
                     setPackages(formattedPackages);
                 }
             } catch (error) {
@@ -68,7 +103,7 @@ const PopularPackages = () => {
             }
         };
 
-        fetchPackages();
+        fetchData();
     }, []);
 
     const handleBookNow = (pkg: LabTest) => {
@@ -147,6 +182,12 @@ const PopularPackages = () => {
                                                 <div className="text-sm font-bold text-gray-400 line-through mb-1">₹{pkg.originalPrice}</div>
                                             )}
                                             <div className="text-3xl font-extrabold text-[#be2c2d] drop-shadow-sm">₹{pkg.price}</div>
+                                            {pkg.promoApplied && (
+                                                <p className="text-xs text-green-600 font-bold mt-1 uppercase tracking-wide flex items-center gap-1">
+                                                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                                                    Promo Code Applied
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="flex gap-3">
                                             <Button

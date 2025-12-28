@@ -39,6 +39,7 @@ const PackageManager = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [promoCodes, setPromoCodes] = useState<{ id: string, code: string }[]>([]);
     const [selectedPromoCode, setSelectedPromoCode] = useState<string>("");
+    const [applyPromoToDisplayPrice, setApplyPromoToDisplayPrice] = useState(false);
 
     useEffect(() => {
         fetchPackages();
@@ -69,7 +70,8 @@ const PackageManager = () => {
                     price: Number(p.price),
                     originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
                     description: p.description || "",
-                    promoCode: p.promo_code || ""
+                    promoCode: p.promo_code || "",
+                    applyPromoToDisplayPrice: p.apply_promo_to_display_price || false
                 }));
                 setPackages(formattedPackages);
             }
@@ -125,7 +127,8 @@ const PackageManager = () => {
             popular: true,
             deliveryTime: "24-48 hours",
             reportTime: "6-12 hours",
-            promo_code: selectedPromoCode || null
+            promo_code: selectedPromoCode || null,
+            apply_promo_to_display_price: applyPromoToDisplayPrice
         };
 
         try {
@@ -161,13 +164,14 @@ const PackageManager = () => {
         }
     };
 
-    const handleEditPackage = (pkg: HealthPackage & { promoCode?: string }) => {
+    const handleEditPackage = (pkg: HealthPackage & { promoCode?: string, applyPromoToDisplayPrice?: boolean }) => {
         setPackageName(pkg.name);
         setPackagePrice(pkg.price);
         setOriginalPrice(pkg.originalPrice || 0);
         setDescription(pkg.description?.split(". Includes:")[0] || pkg.description || "");
         setSelectedTests([]);
         setSelectedPromoCode(pkg.promoCode || "");
+        setApplyPromoToDisplayPrice(pkg.applyPromoToDisplayPrice || false);
 
         setEditingId(pkg.id);
         setIsCreating(true);
@@ -196,6 +200,7 @@ const PackageManager = () => {
         setDescription("");
         setEditingId(null);
         setSelectedPromoCode("");
+        setApplyPromoToDisplayPrice(false);
         setSearchTerm("");
     };
 
@@ -291,6 +296,22 @@ const PackageManager = () => {
                                 </select>
                             </div>
                         </div>
+
+                        {selectedPromoCode && (
+                            <div className="flex items-center space-x-2 bg-yellow-50 p-3 rounded-md border border-yellow-200">
+                                <Checkbox
+                                    id="applyPromo"
+                                    checked={applyPromoToDisplayPrice}
+                                    onCheckedChange={(c) => setApplyPromoToDisplayPrice(c as boolean)}
+                                />
+                                <Label htmlFor="applyPromo" className="cursor-pointer">
+                                    Show discounted price on the website? <br />
+                                    <span className="text-xs text-muted-foreground font-normal">
+                                        (Will show "Promo Code Applied" and strike-through the original price)
+                                    </span>
+                                </Label>
+                            </div>
+                        )}
 
                         <Button onClick={handleCreatePackage} className="w-full">
                             {editingId ? "Update Package" : "Create Package"}
