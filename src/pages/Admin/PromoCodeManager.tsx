@@ -18,6 +18,7 @@ interface PromoCode {
     expiryDate?: string;
     usageLimit?: number;
     usageCount?: number;
+    min_order_value?: number;
 }
 
 const PromoCodeManager = () => {
@@ -30,6 +31,7 @@ const PromoCodeManager = () => {
     const [discountValue, setDiscountValue] = useState<number>(0);
     const [expiryDate, setExpiryDate] = useState("");
     const [usageLimit, setUsageLimit] = useState("");
+    const [minOrderValue, setMinOrderValue] = useState<number>(0);
 
     useEffect(() => {
         fetchPromoCodes();
@@ -52,7 +54,8 @@ const PromoCodeManager = () => {
                 active: p.active,
                 expiryDate: p.expiryDate,
                 usageLimit: p.usageLimit,
-                usageCount: p.usageCount
+                usageCount: p.usageCount,
+                min_order_value: p.min_order_value
             }));
             setPromoCodes(formattedPromos);
         } catch (error) {
@@ -73,7 +76,8 @@ const PromoCodeManager = () => {
                 "discountType": discountType,
                 "discountValue": discountValue,
                 "expiryDate": expiryDate || null,
-                "usageLimit": usageLimit ? parseInt(usageLimit) : null
+                "usageLimit": usageLimit ? parseInt(usageLimit) : null,
+                "min_order_value": minOrderValue || 0
             }]);
 
             if (error) throw error;
@@ -84,6 +88,7 @@ const PromoCodeManager = () => {
             setDiscountValue(0);
             setExpiryDate("");
             setUsageLimit("");
+            setMinOrderValue(0);
             fetchPromoCodes();
 
         } catch (error: any) {
@@ -141,6 +146,10 @@ const PromoCodeManager = () => {
                                 <Input type="number" value={discountValue} onChange={(e) => setDiscountValue(parseFloat(e.target.value))} />
                             </div>
                             <div className="space-y-2">
+                                <Label>Min Order Value (₹)</Label>
+                                <Input type="number" value={minOrderValue} onChange={(e) => setMinOrderValue(parseFloat(e.target.value))} placeholder="0 for none" />
+                            </div>
+                            <div className="space-y-2">
                                 <Label>Expiry Date</Label>
                                 <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                             </div>
@@ -161,6 +170,7 @@ const PromoCodeManager = () => {
                             <TableRow>
                                 <TableHead>Code</TableHead>
                                 <TableHead>Discount</TableHead>
+                                <TableHead>Min Order</TableHead>
                                 <TableHead>Expiry</TableHead>
                                 <TableHead>Usage</TableHead>
                                 <TableHead>Status</TableHead>
@@ -176,6 +186,9 @@ const PromoCodeManager = () => {
                                     </TableCell>
                                     <TableCell>
                                         {promo.discountType === "percentage" ? `${promo.discountValue}%` : `₹${promo.discountValue}`} OFF
+                                    </TableCell>
+                                    <TableCell>
+                                        {promo.min_order_value ? `₹${promo.min_order_value}` : "-"}
                                     </TableCell>
                                     <TableCell>
                                         {promo.expiryDate ? new Date(promo.expiryDate).toLocaleDateString() : "No Expiry"}

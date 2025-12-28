@@ -95,6 +95,11 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm, autoPromoCode }:
                 return;
             }
 
+            if (data.min_order_value && subtotal < data.min_order_value) {
+                setPromoError(`Order must be at least ₹${data.min_order_value} to use this code`);
+                return;
+            }
+
             // Calculate discount
             let calculatedDiscount = 0;
             if (data.discountType === 'percentage') {

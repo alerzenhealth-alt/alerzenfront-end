@@ -78,6 +78,7 @@ export type Database = {
           expiryDate: string | null
           usageLimit: number | null
           usageCount: number | null
+          min_order_value: number | null
           created_at: string
         }
         Insert: {
@@ -89,6 +90,7 @@ export type Database = {
           expiryDate?: string | null
           usageLimit?: number | null
           usageCount?: number | null
+          min_order_value?: number | null
           created_at?: string
         }
         Update: {
@@ -100,6 +102,7 @@ export type Database = {
           expiryDate?: string | null
           usageLimit?: number | null
           usageCount?: number | null
+          min_order_value?: number | null
           created_at?: string
         }
         Relationships: []
