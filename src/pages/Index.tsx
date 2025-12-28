@@ -20,6 +20,7 @@ const Index = () => {
       <AnnouncementBanner />
       <Hero />
       <PopularPackages />
+      <ProcessSteps />
 
       {/* Popular Tests Section - Integrated from HealthPackages */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

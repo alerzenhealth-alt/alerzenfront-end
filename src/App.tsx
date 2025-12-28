@@ -16,6 +16,8 @@ import TestDetails from "./pages/TestDetails";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FAQ from "./pages/FAQ";
 
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +25,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <ExitIntentPopup />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
