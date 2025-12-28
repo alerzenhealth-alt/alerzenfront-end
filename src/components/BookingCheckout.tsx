@@ -224,7 +224,7 @@ Please schedule my home sample collection.`;
                     </div>
 
                     <div className="space-y-2 pt-2 border-t border-gray-200/50">
-                        <Label>Promo Code</Label>
+                        <Label>Promo Code (Optional)</Label>
                         <div className="flex gap-2">
                             <Input
                                 placeholder="Enter code"
