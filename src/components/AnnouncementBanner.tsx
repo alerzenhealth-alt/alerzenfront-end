@@ -16,24 +16,19 @@ export const AnnouncementBanner = () => {
             const { data, error } = await supabase
                 .from('site_settings')
                 .select('*')
-                .in('key', ['announcement_banner', 'announcement_speed']);
+                .eq('id', 1)
+                .single();
 
             if (error) {
                 console.error("Error fetching banner settings:", error);
+                // Fallback valid defaults if needed, or just return
                 return;
             }
 
             if (data) {
-                const banner = data.find(d => d.key === 'announcement_banner');
-                const speedSetting = data.find(d => d.key === 'announcement_speed');
-
-                if (banner) {
-                    setText(banner.value);
-                    setIsActive(banner.is_active);
-                }
-                if (speedSetting) {
-                    setSpeed(Number(speedSetting.value) || 20);
-                }
+                setText(data.announcement_banner_text || "");
+                setIsActive(data.announcement_banner_enabled || false);
+                setSpeed(data.announcement_banner_speed || 20);
             }
         } catch (error) {
             console.error("Failed to load banner:", error);

@@ -15,12 +15,12 @@ export const HeroBanner = () => {
             const { data } = await supabase
                 .from('site_settings')
                 .select('*')
-                .eq('key', 'hero_banner')
-                .maybeSingle();
+                .eq('id', 1)
+                .single();
 
             if (data) {
-                setText(data.value);
-                setIsActive(data.is_active || false);
+                setText(data.hero_banner_text || "");
+                setIsActive(data.hero_banner_enabled || false);
             }
         } catch (error) {
             console.error("Failed to load hero banner:", error);

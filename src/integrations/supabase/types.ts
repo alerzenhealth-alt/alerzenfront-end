@@ -117,6 +117,11 @@ export type Database = {
           exit_popup_heading: string | null
           exit_popup_subheading: string | null
           exit_popup_promo_code: string | null
+          announcement_banner_enabled: boolean
+          announcement_banner_text: string | null
+          announcement_banner_speed: number
+          hero_banner_enabled: boolean
+          hero_banner_text: string | null
         }
         Insert: {
           id?: number
@@ -124,6 +129,11 @@ export type Database = {
           exit_popup_heading?: string | null
           exit_popup_subheading?: string | null
           exit_popup_promo_code?: string | null
+          announcement_banner_enabled?: boolean
+          announcement_banner_text?: string | null
+          announcement_banner_speed?: number
+          hero_banner_enabled?: boolean
+          hero_banner_text?: string | null
         }
         Update: {
           id?: number
@@ -131,6 +141,11 @@ export type Database = {
           exit_popup_heading?: string | null
           exit_popup_subheading?: string | null
           exit_popup_promo_code?: string | null
+          announcement_banner_enabled?: boolean
+          announcement_banner_text?: string | null
+          announcement_banner_speed?: number
+          hero_banner_enabled?: boolean
+          hero_banner_text?: string | null
         }
         Relationships: []
       }

@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 const SettingsManager = () => {
     const [loading, setLoading] = useState(true);
@@ -17,6 +18,15 @@ const SettingsManager = () => {
     const [exitPopupHeading, setExitPopupHeading] = useState("");
     const [exitPopupSubheading, setExitPopupSubheading] = useState("");
     const [exitPopupPromoCode, setExitPopupPromoCode] = useState("");
+
+    // Banner State
+    const [bannerText, setBannerText] = useState("");
+    const [isBannerActive, setIsBannerActive] = useState(false);
+    const [bannerSpeed, setBannerSpeed] = useState(20);
+
+    // Hero Banner State
+    const [heroBannerText, setHeroBannerText] = useState("");
+    const [isHeroBannerActive, setIsHeroBannerActive] = useState(false);
 
     useEffect(() => {
         fetchSettings();
@@ -34,10 +44,20 @@ const SettingsManager = () => {
             if (error) throw error;
 
             if (data) {
+                // Exit Intent
                 setExitPopupEnabled(data.exit_popup_enabled);
                 setExitPopupHeading(data.exit_popup_heading || "");
                 setExitPopupSubheading(data.exit_popup_subheading || "");
                 setExitPopupPromoCode(data.exit_popup_promo_code || "");
+
+                // Announcement Banner
+                setIsBannerActive(data.announcement_banner_enabled || false);
+                setBannerText(data.announcement_banner_text || "");
+                setBannerSpeed(data.announcement_banner_speed || 20);
+
+                // Hero Banner
+                setIsHeroBannerActive(data.hero_banner_enabled || false);
+                setHeroBannerText(data.hero_banner_text || "");
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
@@ -53,16 +73,26 @@ const SettingsManager = () => {
             const { error } = await supabase
                 .from('site_settings')
                 .update({
+                    // Exit Intent
                     exit_popup_enabled: exitPopupEnabled,
                     exit_popup_heading: exitPopupHeading,
                     exit_popup_subheading: exitPopupSubheading,
-                    exit_popup_promo_code: exitPopupPromoCode
+                    exit_popup_promo_code: exitPopupPromoCode,
+
+                    // Announcement Banner
+                    announcement_banner_enabled: isBannerActive,
+                    announcement_banner_text: bannerText,
+                    announcement_banner_speed: bannerSpeed,
+
+                    // Hero Banner
+                    hero_banner_enabled: isHeroBannerActive,
+                    hero_banner_text: heroBannerText
                 })
                 .eq('id', 1);
 
             if (error) throw error;
 
-            toast.success("Marketing settings saved successfully!");
+            toast.success("All settings saved successfully!");
         } catch (error: any) {
             console.error("Save error:", error);
             toast.error(error.message || "Failed to save settings");
@@ -78,6 +108,82 @@ const SettingsManager = () => {
     return (
         <div className="space-y-6 max-w-2xl">
             <h2 className="text-2xl font-bold">Site Settings</h2>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Top Announcement Banner</CardTitle>
+                    <CardDescription>
+                        Manage the scrolling text banner at the very top.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between space-x-2">
+                        <Label htmlFor="banner-active" className="flex flex-col space-y-1">
+                            <span>Enable Top Banner</span>
+                        </Label>
+                        <Switch
+                            id="banner-active"
+                            checked={isBannerActive}
+                            onCheckedChange={setIsBannerActive}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="banner-text">Banner Text</Label>
+                        <Input
+                            id="banner-text"
+                            value={bannerText}
+                            onChange={(e) => setBannerText(e.target.value)}
+                            placeholder="Call us for home collection..."
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <Label>Scroll Speed (Duration: {bannerSpeed}s)</Label>
+                            <span className="text-xs text-muted-foreground">Lower is faster</span>
+                        </div>
+                        <Slider
+                            value={[bannerSpeed]}
+                            onValueChange={(vals) => setBannerSpeed(vals[0])}
+                            min={5}
+                            max={60}
+                            step={1}
+                        />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Hero Notification</CardTitle>
+                    <CardDescription>
+                        A glassmorphism banner appearing just above the search bar.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between space-x-2">
+                        <Label htmlFor="hero-active" className="flex flex-col space-y-1">
+                            <span>Enable Hero Banner</span>
+                        </Label>
+                        <Switch
+                            id="hero-active"
+                            checked={isHeroBannerActive}
+                            onCheckedChange={setIsHeroBannerActive}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="hero-text">Notification Text</Label>
+                        <Input
+                            id="hero-text"
+                            placeholder="e.g. Reports in 6 hours!"
+                            value={heroBannerText}
+                            onChange={(e) => setHeroBannerText(e.target.value)}
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
             <Card>
                 <CardHeader>
