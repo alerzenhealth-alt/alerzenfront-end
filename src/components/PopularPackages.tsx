@@ -23,6 +23,7 @@ interface LabTest {
     deliveryTime: string;
     description?: string;
     popular?: boolean;
+    promo_code?: string;
 }
 
 const PopularPackages = () => {
@@ -55,7 +56,8 @@ const PopularPackages = () => {
                         originalPrice: test.originalPrice ? Number(test.originalPrice) : undefined,
                         deliveryTime: test.deliveryTime || "24 hrs",
                         description: test.description || "",
-                        popular: test.popular || false
+                        popular: test.popular || false,
+                        promo_code: test.promo_code || undefined
                     }));
                     setPackages(formattedPackages);
                 }
@@ -234,6 +236,7 @@ const PopularPackages = () => {
                     onOpenChange={setIsCheckoutOpen}
                     cart={selectedPackage ? [selectedPackage] : []}
                     onConfirm={() => setSelectedPackage(null)}
+                    autoPromoCode={selectedPackage?.promo_code}
                 />
             </div>
         </section>

@@ -21,6 +21,7 @@ interface LabTest {
   deliveryTime: string;
   description?: string;
   popular?: boolean;
+  promo_code?: string;
 }
 
 const HealthPackages = () => {
@@ -57,7 +58,8 @@ const HealthPackages = () => {
             originalPrice: test.originalPrice ? Number(test.originalPrice) : undefined,
             deliveryTime: test.deliveryTime || "24-48 hours",
             description: test.description || "",
-            popular: test.popular || false
+            popular: test.popular || false,
+            promo_code: test.promo_code || undefined
           }));
           setAllTests(formattedTests);
         }
@@ -376,6 +378,7 @@ const HealthPackages = () => {
           setSelectedTest(null);
           // Optional: Show success toast or redirect
         }}
+        autoPromoCode={selectedTest?.promo_code}
       />
 
       {/* CTA Section */}

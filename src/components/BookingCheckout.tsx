@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +19,10 @@ interface BookingCheckoutProps {
     onOpenChange: (open: boolean) => void;
     cart: LabTest[];
     onConfirm?: () => void;
+    autoPromoCode?: string;
 }
 
-const BookingCheckout = ({ open, onOpenChange, cart, onConfirm }: BookingCheckoutProps) => {
+const BookingCheckout = ({ open, onOpenChange, cart, onConfirm, autoPromoCode }: BookingCheckoutProps) => {
     const [formData, setFormData] = useState({
         name: "",
         age: "",
@@ -35,6 +36,20 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm }: BookingCheckou
     const [appliedPromo, setAppliedPromo] = useState("");
     const { toast } = useToast();
 
+    // Auto-apply promo code when dialog opens
+    useEffect(() => {
+        if (open && autoPromoCode) {
+            setPromoCode(autoPromoCode);
+            validatePromoCode(autoPromoCode);
+        } else if (open) {
+            // Reset states when opening without auto code
+            setPromoCode("");
+            setDiscount(0);
+            setAppliedPromo("");
+            setPromoError("");
+        }
+    }, [open, autoPromoCode]);
+
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const total = Math.max(0, subtotal - discount);
 
@@ -43,8 +58,9 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm }: BookingCheckou
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const validatePromoCode = async () => {
-        if (!promoCode.trim()) return;
+    const validatePromoCode = async (codeToValidate?: string) => {
+        const code = codeToValidate || promoCode;
+        if (!code.trim()) return;
 
         setIsValidatingPromo(true);
         setPromoError("");
@@ -55,7 +71,7 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm }: BookingCheckou
             const { data, error } = await supabase
                 .from('promo_codes')
                 .select('*')
-                .eq('code', promoCode.toUpperCase())
+                .eq('code', code.toUpperCase())
                 .single();
 
             if (error || !data) {
@@ -218,7 +234,7 @@ Please schedule my home sample collection.`;
                             />
                             <Button
                                 variant="outline"
-                                onClick={validatePromoCode}
+                                onClick={() => validatePromoCode()}
                                 disabled={isValidatingPromo || !promoCode}
                                 className="border-primary text-primary hover:bg-primary/10"
                             >
