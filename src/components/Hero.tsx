@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 import heroImage from "@/assets/hero-phlebotomist-real.png";
 import familyImage from "@/assets/indian-family.png";
 import labImage from "@/assets/lab-equipment.png";
+import { HeroBanner } from "./HeroBanner";
 import HeroSearchBar from "./HeroSearchBar";
 import { openWhatsApp } from "@/lib/whatsapp";
 import useEmblaCarousel from "embla-carousel-react";
@@ -29,6 +30,7 @@ const Hero = () => {
 
             {/* Search Bar */}
             <div className="max-w-xl mx-auto lg:mx-0">
+              <HeroBanner />
               <HeroSearchBar />
             </div>
 
