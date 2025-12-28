@@ -7,20 +7,16 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 
 const SettingsManager = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    // Banner State
-    const [bannerText, setBannerText] = useState("");
-    const [isBannerActive, setIsBannerActive] = useState(false);
-    const [bannerSpeed, setBannerSpeed] = useState(20); // Default 20s
-
-    // Hero Banner State
-    const [heroBannerText, setHeroBannerText] = useState("");
-    const [isHeroBannerActive, setIsHeroBannerActive] = useState(false);
+    // Exit Intent State
+    const [exitPopupEnabled, setExitPopupEnabled] = useState(true);
+    const [exitPopupHeading, setExitPopupHeading] = useState("");
+    const [exitPopupSubheading, setExitPopupSubheading] = useState("");
+    const [exitPopupPromoCode, setExitPopupPromoCode] = useState("");
 
     useEffect(() => {
         fetchSettings();
@@ -32,66 +28,41 @@ const SettingsManager = () => {
             const { data, error } = await supabase
                 .from('site_settings')
                 .select('*')
-                .in('key', ['announcement_banner', 'announcement_speed', 'hero_banner']);
+                .eq('id', 1)
+                .single();
 
             if (error) throw error;
 
             if (data) {
-                const banner = data.find(d => d.key === 'announcement_banner');
-                const speed = data.find(d => d.key === 'announcement_speed');
-                const hero = data.find(d => d.key === 'hero_banner');
-
-                if (banner) {
-                    setBannerText(banner.value || "");
-                    setIsBannerActive(banner.is_active || false);
-                }
-                if (speed) {
-                    setBannerSpeed(Number(speed.value) || 20);
-                }
-                if (hero) {
-                    setHeroBannerText(hero.value || "");
-                    setIsHeroBannerActive(hero.is_active || false);
-                }
+                setExitPopupEnabled(data.exit_popup_enabled);
+                setExitPopupHeading(data.exit_popup_heading || "");
+                setExitPopupSubheading(data.exit_popup_subheading || "");
+                setExitPopupPromoCode(data.exit_popup_promo_code || "");
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
-            toast.error("Failed to load settings.");
+            toast.error("Failed to load settings. Ensure the database table exists.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSaveBanner = async () => {
+    const handleSave = async () => {
         setSaving(true);
         try {
-            const updates = [
-                {
-                    key: 'announcement_banner',
-                    value: bannerText,
-                    is_active: isBannerActive,
-                    updated_at: new Date().toISOString()
-                },
-                {
-                    key: 'announcement_speed',
-                    value: String(bannerSpeed),
-                    is_active: true,
-                    updated_at: new Date().toISOString()
-                },
-                {
-                    key: 'hero_banner',
-                    value: heroBannerText,
-                    is_active: isHeroBannerActive,
-                    updated_at: new Date().toISOString()
-                }
-            ];
-
             const { error } = await supabase
                 .from('site_settings')
-                .upsert(updates);
+                .update({
+                    exit_popup_enabled: exitPopupEnabled,
+                    exit_popup_heading: exitPopupHeading,
+                    exit_popup_subheading: exitPopupSubheading,
+                    exit_popup_promo_code: exitPopupPromoCode
+                })
+                .eq('id', 1);
 
             if (error) throw error;
 
-            toast.success("Settings saved successfully!");
+            toast.success("Marketing settings saved successfully!");
         } catch (error: any) {
             console.error("Save error:", error);
             toast.error(error.message || "Failed to save settings");
@@ -110,82 +81,61 @@ const SettingsManager = () => {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Top Announcement Banner</CardTitle>
+                    <CardTitle>Exit Intent Popup (Marketing)</CardTitle>
                     <CardDescription>
-                        Manage the scrolling text banner at the very top.
+                        Manage the popup that appears when users try to leave the site.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between space-x-2">
-                        <Label htmlFor="banner-active" className="flex flex-col space-y-1">
-                            <span>Enable Top Banner</span>
+                    <div className="flex items-center justify-between space-x-2 border-b pb-4">
+                        <Label htmlFor="popup-active" className="flex flex-col space-y-1">
+                            <span className="font-medium">Enable Popup</span>
+                            <span className="text-xs text-muted-foreground">Show this popup on Desktop (exit intent) and Mobile (timer).</span>
                         </Label>
                         <Switch
-                            id="banner-active"
-                            checked={isBannerActive}
-                            onCheckedChange={setIsBannerActive}
+                            id="popup-active"
+                            checked={exitPopupEnabled}
+                            onCheckedChange={setExitPopupEnabled}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="banner-text">Banner Text</Label>
+                        <Label htmlFor="popup-heading">Heading Text</Label>
                         <Input
-                            id="banner-text"
-                            value={bannerText}
-                            onChange={(e) => setBannerText(e.target.value)}
+                            id="popup-heading"
+                            value={exitPopupHeading}
+                            onChange={(e) => setExitPopupHeading(e.target.value)}
+                            placeholder="Wait! Don't Miss Out"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <Label>Scroll Speed (Duration: {bannerSpeed}s)</Label>
-                            <span className="text-xs text-muted-foreground">Lower is faster (e.g. 5s is very fast, 60s is slow)</span>
-                        </div>
-                        <Slider
-                            value={[bannerSpeed]}
-                            onValueChange={(vals) => setBannerSpeed(vals[0])}
-                            min={5}
-                            max={60}
-                            step={1}
+                        <Label htmlFor="popup-subheading">Subheading / Offer Text</Label>
+                        <Input
+                            id="popup-subheading"
+                            value={exitPopupSubheading}
+                            onChange={(e) => setExitPopupSubheading(e.target.value)}
+                            placeholder="Get an extra 10% OFF..."
                         />
                     </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="popup-code">Promo Code to Display</Label>
+                        <Input
+                            id="popup-code"
+                            value={exitPopupPromoCode}
+                            onChange={(e) => setExitPopupPromoCode(e.target.value)}
+                            placeholder="HEALTH10"
+                        />
+                        <p className="text-xs text-muted-foreground">Make sure this code actually exists in 'Promo Codes' tab!</p>
+                    </div>
+
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Hero Notification (Above Search)</CardTitle>
-                    <CardDescription>
-                        A glassmorphism banner appearing just above the search bar.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between space-x-2">
-                        <Label htmlFor="hero-active" className="flex flex-col space-y-1">
-                            <span>Enable Hero Banner</span>
-                        </Label>
-                        <Switch
-                            id="hero-active"
-                            checked={isHeroBannerActive}
-                            onCheckedChange={setIsHeroBannerActive}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="hero-text">Notification Text</Label>
-                        <Input
-                            id="hero-text"
-                            placeholder="e.g. Reports in 6 hours!"
-                            value={heroBannerText}
-                            onChange={(e) => setHeroBannerText(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Button onClick={handleSaveBanner} disabled={saving} className="w-full">
+            <Button onClick={handleSave} disabled={saving} className="w-full">
                 {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                Save All Settings
+                Save Settings
             </Button>
         </div>
     );

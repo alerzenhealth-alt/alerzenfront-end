@@ -112,22 +112,25 @@ export type Database = {
       }
       site_settings: {
         Row: {
-          key: string
-          value: string | null
-          is_active: boolean | null
-          updated_at: string | null
+          id: number
+          exit_popup_enabled: boolean
+          exit_popup_heading: string | null
+          exit_popup_subheading: string | null
+          exit_popup_promo_code: string | null
         }
         Insert: {
-          key: string
-          value?: string | null
-          is_active?: boolean | null
-          updated_at?: string | null
+          id?: number
+          exit_popup_enabled?: boolean
+          exit_popup_heading?: string | null
+          exit_popup_subheading?: string | null
+          exit_popup_promo_code?: string | null
         }
         Update: {
-          key?: string
-          value?: string | null
-          is_active?: boolean | null
-          updated_at?: string | null
+          id?: number
+          exit_popup_enabled?: boolean
+          exit_popup_heading?: string | null
+          exit_popup_subheading?: string | null
+          exit_popup_promo_code?: string | null
         }
         Relationships: []
       }

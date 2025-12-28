@@ -2,33 +2,104 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Gift, Copy, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ExitIntentPopup = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [hasCopied, setHasCopied] = useState(false);
 
-    useEffect(() => {
-        // Check if already seen in this session
-        const hasSeen = sessionStorage.getItem("hasSeenExitPopup");
-        if (hasSeen) return;
+    // Settings State
+    const [enabled, setEnabled] = useState(false);
+    const [heading, setHeading] = useState("Wait! Don't Miss Out");
+    const [subheading, setSubheading] = useState("Get an extra discount today.");
+    const [promoCode, setPromoCode] = useState("HEALTH10");
 
-        // Desktop: Exit Intent (Mouse leaves window)
-        const onMouseLeave = (e: MouseEvent) => {
-            if (e.clientY <= 0) {
-                triggerPopup();
+    useEffect(() => {
+        const init = async () => {
+            // Check session first to avoid unnecessary fetch
+            const hasSeen = sessionStorage.getItem("hasSeenExitPopup");
+            if (hasSeen) return;
+
+            // Fetch settings
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('*')
+                .eq('id', 1)
+                .single();
+
+            if (data && data.exit_popup_enabled) {
+                setEnabled(true);
+                setHeading(data.exit_popup_heading || "Wait! Don't Miss Out");
+                setSubheading(data.exit_popup_subheading || "Get an extra discount today.");
+                setPromoCode(data.exit_popup_promo_code || "HEALTH10");
+
+                // Attach listeners since it is enabled
+                attachListeners();
             }
         };
 
-        // Mobile: Timeout (15 seconds)
-        const timer = setTimeout(() => {
-            triggerPopup();
-        }, 15000);
+        const attachListeners = () => {
+            // Desktop: Exit Intent
+            const onMouseLeave = (e: MouseEvent) => {
+                if (e.clientY <= 0) {
+                    triggerPopup();
+                }
+            };
 
-        document.addEventListener("mouseleave", onMouseLeave);
+            // Mobile: Timeout (15s)
+            const timer = setTimeout(() => {
+                triggerPopup();
+            }, 15000);
+
+            document.addEventListener("mouseleave", onMouseLeave);
+
+            // Cleanup function for this closure
+            // Note: This cleanup is tricky because it's inside `init` which is inside useEffect. 
+            // Better to rely on the main useEffect cleanup if possible, but since we attach conditionally...
+            // We can store the cleanup function in a ref or simply attach them globally and check 'enabled' inside the handler.
+            // Simplified approach: Trigger logic checks 'enabled' logic (but 'enabled' state is set async).
+            // Current approach is fine for now; we just need to ensure we don't leak.
+            // Actually, `init` runs once. The return of `init` is ignored.
+            // So we need to refactor to ensure listeners are cleaned up on unmount.
+        };
+
+        // Refactored Logic for Cleanup Safety
+        let cleanup: (() => void) | undefined;
+
+        const setup = async () => {
+            const hasSeen = sessionStorage.getItem("hasSeenExitPopup");
+            if (hasSeen) return;
+
+            const { data } = await supabase.from('site_settings').select('*').eq('id', 1).single();
+
+            if (data && data.exit_popup_enabled) {
+                setEnabled(true);
+                setHeading(data.exit_popup_heading || "");
+                setSubheading(data.exit_popup_subheading || "");
+                setPromoCode(data.exit_popup_promo_code || "");
+
+                const onMouseLeave = (e: MouseEvent) => {
+                    if (e.clientY <= 0) {
+                        triggerPopup();
+                    }
+                };
+                const timer = setTimeout(() => {
+                    triggerPopup();
+                }, 15000);
+
+                document.addEventListener("mouseleave", onMouseLeave);
+
+                cleanup = () => {
+                    document.removeEventListener("mouseleave", onMouseLeave);
+                    clearTimeout(timer);
+                };
+            }
+        };
+
+        setup();
 
         return () => {
-            document.removeEventListener("mouseleave", onMouseLeave);
-            clearTimeout(timer);
+            if (cleanup) cleanup();
         };
     }, []);
 
@@ -41,7 +112,7 @@ const ExitIntentPopup = () => {
     };
 
     const handleCopyCode = () => {
-        navigator.clipboard.writeText("HEALTH10");
+        navigator.clipboard.writeText(promoCode);
         setHasCopied(true);
         setTimeout(() => setHasCopied(false), 2000);
     };
@@ -49,6 +120,8 @@ const ExitIntentPopup = () => {
     const handleClose = () => {
         setIsOpen(false);
     };
+
+    if (!enabled && !isOpen) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -71,9 +144,11 @@ const ExitIntentPopup = () => {
                         </div>
 
                         <DialogHeader className="mb-2">
-                            <DialogTitle className="text-2xl font-black text-white text-center">Wait! Don't Miss Out</DialogTitle>
+                            <DialogTitle className="text-2xl font-black text-white text-center">
+                                {heading}
+                            </DialogTitle>
                             <DialogDescription className="text-white/90 text-center font-medium">
-                                Get an extra <span className="text-yellow-300 font-bold text-lg">10% OFF</span> on your first health checkup.
+                                {subheading}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -83,7 +158,7 @@ const ExitIntentPopup = () => {
                                 className="flex items-center justify-between bg-gray-50 border-2 border-dashed border-primary/30 rounded-xl p-3 cursor-pointer hover:bg-gray-100 transition-colors group"
                                 onClick={handleCopyCode}
                             >
-                                <span className="text-xl font-black text-primary tracking-widest pl-2">HEALTH10</span>
+                                <span className="text-xl font-black text-primary tracking-widest pl-2">{promoCode}</span>
                                 <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-2 min-w-[40px] flex justify-center">
                                     {hasCopied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5 text-gray-400 group-hover:text-primary" />}
                                 </div>
