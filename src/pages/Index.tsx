@@ -12,6 +12,7 @@ import WhatsAppFloat from "@/components/WhatsAppFloat";
 import PopularPackages from "@/components/PopularPackages";
 
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import FAQ from "@/components/FAQ";
 
 const Index = () => {
   return (
@@ -33,6 +34,8 @@ const Index = () => {
 
       <TrustSection />
       <Testimonials />
+      <Testimonials />
+      <FAQ />
       <Footer />
       <WhatsAppFloat />
     </div>
