@@ -39,44 +39,28 @@ const PopularPackages = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch promo codes first
-                const { data: promoData } = await supabase
-                    .from('promo_codes')
-                    .select('*')
-                    .eq('active', true);
-
-                // Fetch tests
-                const { data: testData, error } = await supabase
-                    .from('tests')
-                    .select('*')
-                    .ilike('category', '%Package%')
-                    .order('price', { ascending: true });
+                const { data: promoData } = await supabase.from('promo_codes').select('*').eq('active', true);
+                const { data: testData, error } = await supabase.from('tests').select('*').ilike('category', '%Package%').order('price', { ascending: true });
 
                 if (error) throw error;
 
                 if (testData) {
                     const formattedPackages: LabTest[] = testData.map(test => {
-                        let finalPrice = Number(test.price);
-                        let finalOriginalPrice = test.originalPrice ? Number(test.originalPrice) : undefined;
-                        let isPromoApplied = false;
+                        const sellingPrice = Number(test.price);
+                        const originalPrice = test.originalPrice ? Number(test.originalPrice) : undefined;
+                        let afterPromoPrice: number | undefined = undefined;
 
                         if (test.apply_promo_to_display_price && test.promo_code && promoData) {
                             const promo = promoData.find(p => p.code === test.promo_code);
                             if (promo) {
-                                // Calculate discount
                                 let discountAmount = 0;
                                 if (promo.discountType === 'percentage') {
-                                    discountAmount = (finalPrice * promo.discountValue) / 100;
+                                    discountAmount = (sellingPrice * promo.discountValue) / 100;
                                 } else {
                                     discountAmount = promo.discountValue;
                                 }
-
-                                // Apply if min order value logic passes (usually packages are high value, but good to check)
-                                if (!promo.min_order_value || finalPrice >= promo.min_order_value) {
-                                    // Set new values
-                                    finalOriginalPrice = finalPrice; // Old selling price becomes "original"
-                                    finalPrice = Math.max(0, finalPrice - discountAmount);
-                                    isPromoApplied = true;
+                                if (!promo.min_order_value || sellingPrice >= promo.min_order_value) {
+                                    afterPromoPrice = Math.max(0, sellingPrice - discountAmount);
                                 }
                             }
                         }
@@ -85,13 +69,13 @@ const PopularPackages = () => {
                             id: test.id,
                             name: test.name,
                             category: test.category || "Package",
-                            price: Math.round(finalPrice),
-                            originalPrice: finalOriginalPrice ? Math.round(finalOriginalPrice) : undefined,
+                            price: Math.round(sellingPrice),
+                            originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
                             deliveryTime: test.deliveryTime || "24 hrs",
                             description: test.description || "",
                             popular: test.popular || false,
                             promo_code: test.promo_code || undefined,
-                            promoApplied: isPromoApplied
+                            afterPromoPrice: afterPromoPrice ? Math.round(afterPromoPrice) : undefined
                         };
                     });
                     setPackages(formattedPackages);
@@ -107,14 +91,8 @@ const PopularPackages = () => {
     }, []);
 
     const handleBookNow = (pkg: LabTest) => {
-        let bookingPkg = { ...pkg };
-        // If promo was applied for display, the 'price' is already discounted.
-        // We need to revert to the pre-discount price (stored in originalPrice during our mapping)
-        // so that BookingCheckout can apply the discount calculation correctly without double-dipping.
-        if (pkg.promoApplied && pkg.originalPrice) {
-            bookingPkg.price = pkg.originalPrice;
-        }
-        setSelectedPackage(bookingPkg);
+        // Pass standard selling price to checkout to allow promo code logic to run normally there
+        setSelectedPackage(pkg);
         setIsCheckoutOpen(true);
     };
 
@@ -138,24 +116,27 @@ const PopularPackages = () => {
                     </p>
                 </div>
 
-                <Carousel
-                    opts={{
-                        align: "start",
-                    }}
-                    className="w-full"
-                >
+                <Carousel opts={{ align: "start" }} className="w-full">
                     <CarouselContent className="-ml-4 pb-10 pt-4">
-                        {/* Added padding top/bottom for shadow breathing room */}
                         {packages.map((pkg) => (
                             <CarouselItem key={pkg.id} className="pl-6 md:basis-1/2 lg:basis-1/3">
                                 <Card className="h-full flex flex-col border border-white/60 shadow-xl hover:shadow-2xl hover:shadow-[#be2c2d]/10 transition-all duration-500 group hover:-translate-y-3 bg-gradient-to-br from-white/90 to-[#be2c2d]/5 backdrop-blur-2xl rounded-[2.5rem] overflow-hidden">
                                     <CardHeader className="p-8 pb-4 relative">
-                                        {/* Floating Badge */}
-                                        {pkg.originalPrice && pkg.originalPrice > pkg.price && (
-                                            <div className="absolute top-6 right-6 bg-[#be2c2d] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#be2c2d]/30 z-10 animate-pulse">
-                                                {Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100)}% OFF
-                                            </div>
+                                        {/* Floating Badge Calculation: Use biggest diff */}
+                                        {pkg.afterPromoPrice ? (
+                                            pkg.originalPrice && (
+                                                <div className="absolute top-6 right-6 bg-[#be2c2d] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#be2c2d]/30 z-10 animate-pulse">
+                                                    {Math.round(((pkg.originalPrice - pkg.afterPromoPrice) / pkg.originalPrice) * 100)}% DETOX
+                                                </div>
+                                            )
+                                        ) : (
+                                            pkg.originalPrice && pkg.originalPrice > pkg.price && (
+                                                <div className="absolute top-6 right-6 bg-[#be2c2d] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#be2c2d]/30 z-10 animate-pulse">
+                                                    {Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100)}% OFF
+                                                </div>
+                                            )
                                         )}
+
                                         <div className="flex items-start justify-between mb-4">
                                             <Badge className="bg-[#0b3c65]/10 text-[#0b3c65] border-[#0b3c65]/20 px-3 py-1 text-xs font-bold tracking-wide uppercase shadow-sm">
                                                 {pkg.category}
@@ -170,9 +151,7 @@ const PopularPackages = () => {
                                     </CardHeader>
 
                                     <CardContent className="p-8 pt-0 space-y-6 flex-1">
-                                        {/* Divider */}
                                         <div className="h-px w-full bg-gradient-to-r from-transparent via-[#be2c2d]/20 to-transparent my-2" />
-
                                         <div className="flex flex-wrap gap-3">
                                             <div className="flex items-center gap-2 text-sm font-semibold text-[#0b3c65] bg-white/60 px-4 py-2 rounded-2xl border border-white/80 shadow-sm">
                                                 <Clock className="w-4 h-4 text-[#be2c2d]" /> {pkg.deliveryTime}
@@ -185,15 +164,34 @@ const PopularPackages = () => {
 
                                     <CardFooter className="p-8 pt-6 mt-auto flex items-center justify-between bg-white/40 backdrop-blur-sm border-t border-white/50">
                                         <div>
-                                            {pkg.originalPrice && (
-                                                <div className="text-sm font-bold text-gray-400 line-through mb-1">₹{pkg.originalPrice}</div>
-                                            )}
-                                            <div className="text-3xl font-extrabold text-[#be2c2d] drop-shadow-sm">₹{pkg.price}</div>
-                                            {pkg.promoApplied && (
-                                                <p className="text-xs text-green-600 font-bold mt-1 uppercase tracking-wide flex items-center gap-1">
-                                                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span>
-                                                    Promo Code Applied
-                                                </p>
+                                            {/* Triple Price Logic */}
+                                            {pkg.afterPromoPrice ? (
+                                                <div className="flex flex-col">
+                                                    {/* Row 1: Original + Selling (Both struck/muted) */}
+                                                    <div className="flex items-baseline gap-2 mb-1">
+                                                        {pkg.originalPrice && (
+                                                            <span className="text-xs font-bold text-gray-400 line-through">₹{pkg.originalPrice}</span>
+                                                        )}
+                                                        <span className="text-sm font-bold text-gray-500 line-through decoration-red-500/50">₹{pkg.price}</span>
+                                                    </div>
+
+                                                    {/* Row 2: Final Promo Price */}
+                                                    <div className="text-3xl font-extrabold text-[#be2c2d] drop-shadow-sm">₹{pkg.afterPromoPrice}</div>
+
+                                                    {/* Row 3: Tag */}
+                                                    <p className="text-[10px] text-green-600 font-black mt-1 uppercase tracking-wider flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-md border border-green-100">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse"></span>
+                                                        With {pkg.promo_code}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                // Standard Double Price Logic
+                                                <div>
+                                                    {pkg.originalPrice && (
+                                                        <div className="text-sm font-bold text-gray-400 line-through mb-1">₹{pkg.originalPrice}</div>
+                                                    )}
+                                                    <div className="text-3xl font-extrabold text-[#be2c2d] drop-shadow-sm">₹{pkg.price}</div>
+                                                </div>
                                             )}
                                         </div>
                                         <div className="flex gap-3">

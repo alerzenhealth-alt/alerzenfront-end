@@ -23,6 +23,8 @@ interface BookingCheckoutProps {
 }
 
 const BookingCheckout = ({ open, onOpenChange, cart, onConfirm, autoPromoCode }: BookingCheckoutProps) => {
+    const [localCart, setLocalCart] = useState<LabTest[]>(cart);
+
     const [formData, setFormData] = useState({
         name: "",
         age: "",
@@ -35,6 +37,10 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm, autoPromoCode }:
     const [promoError, setPromoError] = useState("");
     const [appliedPromo, setAppliedPromo] = useState("");
     const { toast } = useToast();
+
+    useEffect(() => {
+        setLocalCart(cart);
+    }, [cart]);
 
     // Auto-apply promo code when dialog opens
     useEffect(() => {
@@ -50,12 +56,48 @@ const BookingCheckout = ({ open, onOpenChange, cart, onConfirm, autoPromoCode }:
         }
     }, [open, autoPromoCode]);
 
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const subtotal = localCart.reduce((sum, item) => sum + item.price, 0);
     const total = Math.max(0, subtotal - discount);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Hardcoded simple recommendation logic
+    const getRecommendations = () => {
+        const currentIds = new Set(localCart.map(i => i.id));
+        const recommendations: LabTest[] = [];
+
+        // If package is in cart, suggest complementary single tests
+        const hasPackage = localCart.some(i => i.name.toLowerCase().includes("package") || i.price > 1000);
+
+        if (hasPackage) {
+            // Vitamin D
+            if (!currentIds.has("d-rec")) {
+                recommendations.push({ id: "d-rec", name: "Vitamin D (Add-on)", price: 499 });
+            }
+            // B12
+            if (!currentIds.has("b12-rec")) {
+                recommendations.push({ id: "b12-rec", name: "Vitamin B12 (Add-on)", price: 550 });
+            }
+        } else {
+            // Basic fallback
+            if (!currentIds.has("cbc-rec")) {
+                recommendations.push({ id: "cbc-rec", name: "CBC - Complete Blog Count", price: 350 });
+            }
+        }
+
+        // Limit to 2 max
+        return recommendations.slice(0, 2);
+    };
+
+    const addToCart = (item: LabTest) => {
+        setLocalCart(prev => [...prev, item]);
+        toast({
+            title: "Added to cart",
+            description: `${item.name} added.`,
+        });
     };
 
     const validatePromoCode = async (codeToValidate?: string) => {
@@ -253,13 +295,41 @@ Please schedule my home sample collection.`;
                     <div className="space-y-2 pt-4 border-t border-gray-200/50">
                         <h4 className="font-semibold text-sm text-gray-700">Order Summary</h4>
                         <div className="text-sm text-gray-500 space-y-1 max-h-32 overflow-y-auto">
-                            {cart.map((item, idx) => (
+                            {localCart.map((item, idx) => (
                                 <div key={idx} className="flex justify-between">
                                     <span className="truncate pr-4">{item.name}</span>
                                     <span>₹{item.price}</span>
                                 </div>
                             ))}
                         </div>
+
+                        {/* Recommendations Section */}
+                        {getRecommendations().length > 0 && (
+                            <div className="mt-4 bg-blue-50/50 rounded-xl p-3 border border-blue-100">
+                                <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                    <Tag className="w-3 h-3" /> Frequently Bought Together
+                                </p>
+                                <div className="space-y-2">
+                                    {getRecommendations().map((rec) => (
+                                        <div key={rec.id} className="flex items-center justify-between bg-white p-2 rounded-lg shadow-sm border border-blue-100/50">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-gray-800">{rec.name}</span>
+                                                <span className="text-xs text-gray-500">₹{rec.price}</span>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                className="h-7 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+                                                onClick={() => addToCart(rec)}
+                                                disabled={localCart.some(i => i.id === rec.id)}
+                                            >
+                                                {localCart.some(i => i.id === rec.id) ? "Added" : "+ Add"}
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="pt-2 mt-2 border-t border-gray-200/50 space-y-1">
                             <div className="flex justify-between text-sm">
