@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -203,11 +203,11 @@ const HealthPackages = () => {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
             ) : (
-              <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 gap-4 px-4 -mx-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:px-0 md:mx-auto md:pb-0 scrollbar-hide">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {popularTests.map((test, index) => (
                   <Card
                     key={index}
-                    className="min-w-[85vw] sm:min-w-[350px] md:min-w-0 snap-center glass-card border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden group hover:-translate-y-2 flex flex-col h-full bg-gradient-to-br from-white/90 to-white/40"
+                    className="glass-card border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden group hover:-translate-y-2 flex flex-col h-full bg-gradient-to-br from-white/90 to-white/40"
                   >
                     <CardHeader className="p-6 pb-2 relative">
                       {/* Discount Badge */}
@@ -307,11 +307,11 @@ const HealthPackages = () => {
               </Button>
             </div>
           ) : (
-            <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 gap-4 px-4 -mx-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:px-0 md:mx-auto md:pb-0 scrollbar-hide">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTests.map((test, index) => (
                 <Card
                   key={index}
-                  className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center glass-card border-white/50 shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group hover:-translate-y-1 bg-white/60"
+                  className="glass-card border-white/50 shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group hover:-translate-y-1 bg-white/60"
                 >
                   <CardHeader className="p-5 pb-3">
                     <div className="flex items-start justify-between mb-2">
@@ -462,7 +462,7 @@ const HealthPackages = () => {
       </section>
 
       <Footer />
-      <WhatsAppFloat />
+
     </div>
   );
 };

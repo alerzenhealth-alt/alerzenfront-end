@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Shield, Users, Award, Clock, MapPin } from "lucide-react";
@@ -119,7 +119,7 @@ const AboutUs = () => {
             </section>
 
             <Footer />
-            <WhatsAppFloat />
+
         </div>
     );
 };

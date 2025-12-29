@@ -7,7 +7,7 @@ import Testimonials from "@/components/Testimonials";
 import Gallery from "@/components/Gallery";
 import ServiceArea from "@/components/ServiceArea";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
+
 
 import PopularPackages from "@/components/PopularPackages";
 
@@ -37,7 +37,7 @@ const Index = () => {
       <Testimonials />
       <FAQ />
       <Footer />
-      <WhatsAppFloat />
+
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Award, Microscope, Shield, Clock, Users } from "lucide-react";
@@ -25,7 +25,7 @@ const PartnerLabs = () => {
   return (
     <div className="min-h-screen bg-background glass-bg-pattern medical-pattern">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-40 md:pb-24 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,8 +57,8 @@ const PartnerLabs = () => {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Every sample collected by Alerzen is processed at Prima's cutting-edge facility, where advanced automation meets human expertise to deliver accurate results you can trust.
               </p>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="mt-4"
                 onClick={() => openWhatsApp("Hi")}
               >
@@ -67,9 +67,9 @@ const PartnerLabs = () => {
             </div>
             <div className="space-y-6">
               <div className="rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src={labFacility} 
-                  alt="Prima Diagnostics Laboratory Facility" 
+                <img
+                  src={labFacility}
+                  alt="Prima Diagnostics Laboratory Facility"
                   className="w-full h-auto"
                 />
               </div>
@@ -92,7 +92,7 @@ const PartnerLabs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {certifications.map((cert, index) => (
-              <div 
+              <div
                 key={index}
                 className="glass-card rounded-3xl p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
@@ -121,9 +121,9 @@ const PartnerLabs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <div className="rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src={mouSigning} 
-                alt="MOU Signing Ceremony between Alerzen Health and Prima Diagnostics" 
+              <img
+                src={mouSigning}
+                alt="MOU Signing Ceremony between Alerzen Health and Prima Diagnostics"
                 className="w-full h-auto"
               />
               <div className="glass-card p-6 -mt-20 mx-6 relative z-10">
@@ -134,9 +134,9 @@ const PartnerLabs = () => {
               </div>
             </div>
             <div className="rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src={mouDocument} 
-                alt="Signed MOU Document" 
+              <img
+                src={mouDocument}
+                alt="Signed MOU Document"
                 className="w-full h-auto"
               />
               <div className="glass-card p-6 -mt-20 mx-6 relative z-10">
@@ -161,7 +161,7 @@ const PartnerLabs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="glass-card rounded-3xl p-8 text-center hover:shadow-xl transition-all duration-300"
               >
@@ -186,19 +186,19 @@ const PartnerLabs = () => {
             <p className="text-xl text-muted-foreground">
               Book your test today and get results from Prima Diagnostics delivered to your phone.
             </p>
-              <Button 
-                size="lg" 
-                className="mt-6"
-                onClick={() => openWhatsApp("Hi")}
-              >
-                Book on WhatsApp
-              </Button>
+            <Button
+              size="lg"
+              className="mt-6"
+              onClick={() => openWhatsApp("Hi")}
+            >
+              Book on WhatsApp
+            </Button>
           </div>
         </div>
       </section>
 
       <Footer />
-      <WhatsAppFloat />
+
     </div>
   );
 };
