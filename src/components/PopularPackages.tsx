@@ -107,13 +107,24 @@ const PopularPackages = () => {
     return (
         <section className="py-20 bg-transparent relative">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16 space-y-4">
+                <div className="text-center mb-16 space-y-4 relative">
                     <h2 className="text-4xl md:text-5xl font-extrabold text-[#0b3c65] tracking-tight drop-shadow-sm">
                         Popular <span className="text-[#be2c2d]">Health Packages</span>
                     </h2>
                     <p className="text-lg text-[#0b3c65]/80 max-w-2xl mx-auto font-medium">
                         Comprehensive full body checkups curated by top doctors at unbeatable prices.
                     </p>
+                    <div className="absolute top-0 right-0 hidden md:block">
+                        <a href="/health-packages" className="text-[#be2c2d] font-bold hover:underline flex items-center gap-1">
+                            View All <ChevronRight className="w-4 h-4" />
+                        </a>
+                    </div>
+                    {/* Mobile View All centered below */}
+                    <div className="md:hidden pt-2">
+                        <a href="/health-packages" className="text-[#be2c2d] font-bold hover:underline inline-flex items-center gap-1">
+                            View All <ChevronRight className="w-4 h-4" />
+                        </a>
+                    </div>
                 </div>
 
                 <Carousel opts={{ align: "start" }} className="w-full">
@@ -215,8 +226,8 @@ const PopularPackages = () => {
                             </CarouselItem>
                         ))}
                     </CarouselContent>
-                    <CarouselPrevious className="hidden md:flex -left-12 h-14 w-14 rounded-full border-none bg-white/80 text-[#0b3c65] shadow-xl hover:bg-white hover:scale-110 transition-all hover:text-[#be2c2d]" />
-                    <CarouselNext className="hidden md:flex -right-12 h-14 w-14 rounded-full border-none bg-white/80 text-[#0b3c65] shadow-xl hover:bg-white hover:scale-110 transition-all hover:text-[#be2c2d]" />
+                    <CarouselPrevious className="flex -left-4 md:-left-12 h-10 w-10 md:h-14 md:w-14 rounded-full border-none bg-white/80 text-[#0b3c65] shadow-xl hover:bg-white hover:scale-110 transition-all hover:text-[#be2c2d] z-20" />
+                    <CarouselNext className="flex -right-4 md:-right-12 h-10 w-10 md:h-14 md:w-14 rounded-full border-none bg-white/80 text-[#0b3c65] shadow-xl hover:bg-white hover:scale-110 transition-all hover:text-[#be2c2d] z-20" />
                 </Carousel>
 
                 {/* Test Details Dialog */}
