@@ -5,7 +5,7 @@ const WhatsAppFloat = () => {
   return (
     <div className="fixed bottom-6 right-6 z-[9999] animate-fade-in">
       <a
-        href="https://wa.me/919986404073?text=Hello%20Alerzen%20Health!%20I%20have%20a%20query%20regarding%20home%20collection."
+        href="https://api.whatsapp.com/send?phone=919986404073&text=Hello%20Alerzen%20Health!%20I%20have%20a%20query%20regarding%20home%20collection."
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center rounded-full w-16 h-16 shadow-2xl hover:scale-110 transition-transform duration-300 backdrop-blur-sm bg-[#25D366] hover:bg-[#20bd5a]"
