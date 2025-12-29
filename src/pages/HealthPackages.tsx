@@ -207,7 +207,7 @@ const HealthPackages = () => {
                 {popularTests.map((test, index) => (
                   <Card
                     key={index}
-                    className="flex-shrink-0 w-[85vw] sm:w-[350px] md:w-auto snap-center glass-card border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden group hover:-translate-y-2 flex flex-col h-full bg-gradient-to-br from-white/90 to-white/40"
+                    className="min-w-[85vw] sm:min-w-[350px] md:min-w-0 snap-center glass-card border-white/60 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden group hover:-translate-y-2 flex flex-col h-full bg-gradient-to-br from-white/90 to-white/40"
                   >
                     <CardHeader className="p-6 pb-2 relative">
                       {/* Discount Badge */}
@@ -311,7 +311,7 @@ const HealthPackages = () => {
               {filteredTests.map((test, index) => (
                 <Card
                   key={index}
-                  className="flex-shrink-0 w-[85vw] sm:w-[320px] md:w-auto snap-center glass-card border-white/50 shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group hover:-translate-y-1 bg-white/60"
+                  className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center glass-card border-white/50 shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group hover:-translate-y-1 bg-white/60"
                 >
                   <CardHeader className="p-5 pb-3">
                     <div className="flex items-start justify-between mb-2">
