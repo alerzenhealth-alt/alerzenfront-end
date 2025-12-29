@@ -3,7 +3,7 @@ import { openWhatsApp } from "@/lib/whatsapp";
 
 const WhatsAppFloat = () => {
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+    <div className="fixed bottom-6 right-6 z-[100]">
       <Button
         variant="default" // Changed from custom 'whatsapp' back to default but styled manually or ensure 'whatsapp' variant exists. Assuming green from style.
         size="lg"
