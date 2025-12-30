@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings, FileText } from "lucide-react";
+import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings, FileText, QrCode } from "lucide-react";
 import TestManager from "./TestManager";
 import PackageManager from "./PackageManager";
 import PromoCodeManager from "./PromoCodeManager";
 import SettingsManager from "./SettingsManager";
 import PDFEditor from "./PDFEditor";
+import QRGenerator from "./QRGenerator";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -56,6 +57,13 @@ const AdminDashboard = () => {
                         <Tag className="w-4 h-4 mr-2" /> Promo Codes
                     </Button>
                     <Button
+                        variant={activeTab === "qr" ? "secondary" : "ghost"}
+                        className="w-full justify-start font-medium"
+                        onClick={() => setActiveTab("qr")}
+                    >
+                        <QrCode className="w-4 h-4 mr-2" /> QR Generator
+                    </Button>
+                    <Button
                         variant={activeTab === "pdf" ? "secondary" : "ghost"}
                         className="w-full justify-start font-medium"
                         onClick={() => setActiveTab("pdf")}
@@ -88,6 +96,7 @@ const AdminDashboard = () => {
                 {activeTab === "tests" && <TestManager />}
                 {activeTab === "packages" && <PackageManager />}
                 {activeTab === "promos" && <PromoCodeManager />}
+                {activeTab === "qr" && <QRGenerator />}
                 {activeTab === "pdf" && <PDFEditor />}
                 {activeTab === "slides" && <div className="text-center text-gray-500 mt-20">Slideshow Manager Coming Soon</div>}
                 {activeTab === "settings" && <SettingsManager />}

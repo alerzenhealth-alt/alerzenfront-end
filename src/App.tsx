@@ -16,38 +16,25 @@ import TestDetails from "./pages/TestDetails";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FAQ from "./pages/FAQ";
 
-import ExitIntentPopup from "@/components/ExitIntentPopup";
-
-const queryClient = new QueryClient();
+import Connect from "./pages/Connect";
+// Admin (Note: We might want to nest this in dashboard or keep separate? 
+// For now, let's keep it under dashboard via conditional rendering OR a separate route. 
+// A separate route is cleaner for a "tool" feel).
+// Wait, the user asked for a tool IN backend. Usually that implies inside the dashboard.
+// Let's modify AdminDashboard to include it instead of a separate route to keep auth simple.
+// BUT I also need to import Connect.
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <ExitIntentPopup />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tests" element={<Tests />} />
-          <Route path="/partner-labs" element={<PartnerLabs />} />
-          <Route path="/health-packages" element={<HealthPackages />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/test/:id" element={<TestDetails />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/faq" element={<FAQ />} />
-
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+    // ...
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/connect/:id" element={<Connect />} />
 
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */ }
+<Route path="*" element={<NotFound />} />
+        </Routes >
+      </BrowserRouter >
+    </TooltipProvider >
+  </QueryClientProvider >
 );
 
 export default App;
