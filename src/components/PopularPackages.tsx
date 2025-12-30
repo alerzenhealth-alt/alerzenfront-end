@@ -240,7 +240,33 @@ const PopularPackages = () => {
                                 </div>
                                 <DialogTitle className="text-3xl font-black text-[#0b3c65]">{detailsPackage?.name}</DialogTitle>
                                 <DialogDescription className="text-lg text-gray-600 pt-3 leading-relaxed">
-                                    {detailsPackage?.description}
+                                    {(() => {
+                                        const desc = detailsPackage?.description || "";
+                                        if (desc.includes("Includes:")) {
+                                            const parts = desc.split("Includes:");
+                                            const mainDesc = parts[0].trim();
+                                            const tests = parts[1].split(",").map(t => t.trim());
+                                            return (
+                                                <div className="space-y-4">
+                                                    <p>{mainDesc.endsWith(".") ? mainDesc : `${mainDesc}.`}</p>
+                                                    <div className="bg-white/50 rounded-xl p-4 border border-[#0b3c65]/10">
+                                                        <h4 className="font-bold text-[#0b3c65] text-sm uppercase tracking-wide mb-2 flex items-center gap-2">
+                                                            <TestTube className="w-4 h-4" /> Tests Included ({tests.length})
+                                                        </h4>
+                                                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                            {tests.map((test, idx) => (
+                                                                <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 font-medium">
+                                                                    <CheckCircle className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                                                                    {test}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                        return desc;
+                                    })()}
                                 </DialogDescription>
                             </DialogHeader>
                         </div>

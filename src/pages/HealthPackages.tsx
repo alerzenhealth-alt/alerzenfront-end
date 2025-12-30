@@ -381,7 +381,33 @@ const HealthPackages = () => {
             </div>
             <DialogTitle className="text-2xl font-bold text-gray-900">{detailsTest?.name}</DialogTitle>
             <DialogDescription className="text-base text-gray-600 pt-2">
-              {detailsTest?.description} || "Comprehensive diagnostic test covering key health parameters."
+              {(() => {
+                const desc = detailsTest?.description || "Comprehensive diagnostic test covering key health parameters.";
+                if (desc.includes("Includes:")) {
+                  const parts = desc.split("Includes:");
+                  const mainDesc = parts[0].trim();
+                  const tests = parts[1].split(",").map(t => t.trim());
+                  return (
+                    <div className="space-y-4">
+                      <p>{mainDesc.endsWith(".") ? mainDesc : `${mainDesc}.`}</p>
+                      <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
+                        <h4 className="font-bold text-primary text-sm uppercase tracking-wide mb-2 flex items-center gap-2">
+                          <TestTube className="w-4 h-4" /> Tests Included ({tests.length})
+                        </h4>
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {tests.map((test, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 font-medium">
+                              <CheckCircle className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                              {test}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                }
+                return desc;
+              })()}
             </DialogDescription>
           </DialogHeader>
 

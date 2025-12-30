@@ -168,8 +168,32 @@ const PackageManager = () => {
         setPackageName(pkg.name);
         setPackagePrice(pkg.price);
         setOriginalPrice(pkg.originalPrice || 0);
-        setDescription(pkg.description?.split(". Includes:")[0] || pkg.description || "");
-        setSelectedTests([]);
+
+        // Parse description for included tests
+        let desc = pkg.description || "";
+        let testsInDescription: string[] = [];
+
+        if (desc.includes("Includes:")) {
+            const parts = desc.split("Includes:");
+            desc = parts[0].trim();
+            // Remove trailing dot if it exists from the split
+            if (desc.endsWith(".")) desc = desc.slice(0, -1);
+
+            const testsStr = parts[1];
+            if (testsStr) {
+                testsInDescription = testsStr.split(",").map(t => t.trim());
+            }
+        }
+
+        setDescription(desc);
+
+        // Match names to IDs
+        const testIds = availableTests
+            .filter(t => testsInDescription.includes(t.name))
+            .map(t => t.id);
+
+        setSelectedTests(testIds);
+
         setSelectedPromoCode(pkg.promoCode || "");
         setApplyPromoToDisplayPrice(pkg.applyPromoToDisplayPrice || false);
 
