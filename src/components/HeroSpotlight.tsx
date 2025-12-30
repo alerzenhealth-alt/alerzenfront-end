@@ -25,14 +25,23 @@ export const HeroSpotlight = ({ className = "" }: { className?: string }) => {
     useEffect(() => {
         const fetchDeal = async () => {
             try {
-                // Fetch the most attractive package (e.g., biggest discount or marked popular)
-                const { data } = await supabase
-                    .from('tests')
-                    .select('*')
-                    .eq('category', 'Package')
-                    .eq('popular', true)
-                    .limit(1)
+                // 1. Check settings for a specific spotlight ID
+                const { data: settings } = await supabase
+                    .from('site_settings')
+                    .select('hero_spotlight_id')
+                    .eq('id', 1)
                     .maybeSingle();
+
+                let query = supabase.from('tests').select('*').eq('category', 'Package');
+
+                // If admin selected a specific package, use it. Otherwise default to popular.
+                if (settings && (settings as any).hero_spotlight_id) {
+                    query = query.eq('id', (settings as any).hero_spotlight_id);
+                } else {
+                    query = query.eq('popular', true).limit(1);
+                }
+
+                const { data } = await query.maybeSingle();
 
                 if (data) {
                     setDeal({

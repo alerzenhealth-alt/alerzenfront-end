@@ -27,10 +27,18 @@ const SettingsManager = () => {
     // Hero Banner State
     const [heroBannerText, setHeroBannerText] = useState("");
     const [isHeroBannerActive, setIsHeroBannerActive] = useState(false);
+    const [heroSpotlightId, setHeroSpotlightId] = useState<string>("");
+    const [packages, setPackages] = useState<{ id: string, name: string }[]>([]);
 
     useEffect(() => {
         fetchSettings();
+        fetchPackages();
     }, []);
+
+    const fetchPackages = async () => {
+        const { data } = await supabase.from('tests').select('id, name').eq('category', 'Package');
+        if (data) setPackages(data);
+    };
 
     const fetchSettings = async () => {
         setLoading(true);
@@ -58,6 +66,12 @@ const SettingsManager = () => {
                 // Hero Banner
                 setIsHeroBannerActive(data.hero_banner_enabled || false);
                 setHeroBannerText(data.hero_banner_text || "");
+                // Use a try-catch for the new column in case it doesn't exist yet to prevent crash
+                try {
+                    setHeroSpotlightId((data as any).hero_spotlight_id || "");
+                } catch (e) {
+                    console.log("Spotlight column missing");
+                }
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
@@ -86,7 +100,8 @@ const SettingsManager = () => {
 
                     // Hero Banner
                     hero_banner_enabled: isHeroBannerActive,
-                    hero_banner_text: heroBannerText
+                    hero_banner_text: heroBannerText,
+                    hero_spotlight_id: heroSpotlightId || null
                 })
                 .eq('id', 1);
 
@@ -100,10 +115,6 @@ const SettingsManager = () => {
             setSaving(false);
         }
     };
-
-    if (loading) {
-        return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
-    }
 
     return (
         <div className="space-y-6 max-w-2xl">
@@ -187,6 +198,35 @@ const SettingsManager = () => {
 
             <Card>
                 <CardHeader>
+                    <CardTitle>Hero Spotlight Card</CardTitle>
+                    <CardDescription>
+                        Select which package appears in the floating glass card on the homepage.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Select Spotlight Package</Label>
+                        <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            value={heroSpotlightId}
+                            onChange={(e) => setHeroSpotlightId(e.target.value)}
+                        >
+                            <option value="">-- Automatic (Best Seller) --</option>
+                            {packages.map(pkg => (
+                                <option key={pkg.id} value={pkg.id}>
+                                    {pkg.name}
+                                </option>
+                            ))}
+                        </select>
+                        <p className="text-xs text-muted-foreground">
+                            If "Automatic" is selected, the system will show the package marked as "Popular".
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
                     <CardTitle>Exit Intent Popup (Marketing)</CardTitle>
                     <CardDescription>
                         Manage the popup that appears when users try to leave the site.
@@ -243,7 +283,7 @@ const SettingsManager = () => {
                 {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                 Save Settings
             </Button>
-        </div>
+        </div >
     );
 };
 
