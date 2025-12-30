@@ -1,25 +1,100 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
-import heroImage from "@/assets/hero-phlebotomist-real.png";
-import familyImage from "@/assets/indian-family.png";
-import labImage from "@/assets/lab-equipment.png";
 import { HeroBanner } from "./HeroBanner";
 import HeroSearchBar from "./HeroSearchBar";
-import { openWhatsApp } from "@/lib/whatsapp";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
 import { HeroSpotlight } from "./HeroSpotlight";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2 } from "lucide-react";
+import heroImage from "@/assets/hero-phlebotomist-real.png";
+import familyImage from "@/assets/indian-family.png";
+import labImage from "@/assets/lab-equipment.png";
 
 const Hero = () => {
-  const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 4000 })]);
-  const images = [heroImage, familyImage, labImage];
+  const navigate = useNavigate();
+  const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
+  const [slides, setSlides] = useState<Array<{
+    id: string;
+    image: string;
+    title: string;
+    price: number;
+    description: string;
+  }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Default fallback static images (just images, no text overlay logic for these in the mixed mode?)
+  // Actually, let's normalize them to the slide format so we can render them consistently.
+  const defaultSlides = [
+    {
+      id: "default-1",
+      image: heroImage,
+      title: "Home Collection",
+      price: 0,
+      description: "Safe & hygienic sample collection"
+    },
+    {
+      id: "default-2",
+      image: familyImage,
+      title: "Family Health",
+      price: 0,
+      description: "Complete care for your loved ones"
+    },
+    {
+      id: "default-3",
+      image: labImage,
+      title: "Advanced Labs",
+      price: 0,
+      description: "NABL Accredited Partners"
+    }
+  ];
+
+  useEffect(() => {
+    fetchHeroPackages();
+  }, []);
+
+  const fetchHeroPackages = async () => {
+    try {
+      const { data } = await supabase
+        .from('tests')
+        .select('*')
+        .eq('category', 'Package')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const validSlides = data
+          .filter(pkg => (pkg as any).image_url) // Only show if they have an image
+          .map(pkg => ({
+            id: pkg.id,
+            image: (pkg as any).image_url,
+            title: pkg.name,
+            price: pkg.price || 0,
+            description: pkg.description || ""
+          }));
+
+        if (validSlides.length > 0) {
+          setSlides(validSlides);
+        } else {
+          setSlides(defaultSlides);
+        }
+      } else {
+        setSlides(defaultSlides);
+      }
+    } catch (error) {
+      console.error("Error fetching slides", error);
+      setSlides(defaultSlides);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 bg-white overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Text Content - Order 2 on mobile, Order 1 on desktop */}
+
+          {/* LEFT COLUMN: Text & Search */}
           <div className="order-2 lg:order-1 text-center lg:text-left space-y-6 lg:space-y-8 z-10">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
               The fastest way to get a <span className="text-primary">lab test</span>
@@ -50,37 +125,70 @@ const Hero = () => {
                 NABL Labs
               </div>
             </div>
-            {/* Mobile Spotlight Card */}
-            <div className="block lg:hidden mt-8">
-              <HeroSpotlight className="w-full" />
-            </div>
           </div>
 
-          {/* Hero Carousel - Order 1 on mobile, Order 2 on desktop */}
+          {/* RIGHT COLUMN: Dynamic Carousel */}
           <div className="order-1 lg:order-2 relative w-full aspect-[4/3] lg:aspect-square max-h-[400px] lg:max-h-[600px]">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-accent/10 rounded-3xl transform rotate-3 z-0"></div>
-            <div className="relative z-10 overflow-hidden rounded-3xl shadow-2xl h-full w-full" ref={emblaRef}>
+
+            <div className="relative z-10 overflow-hidden rounded-3xl shadow-2xl h-full w-full bg-gray-100" ref={emblaRef}>
               <div className="flex h-full">
-                {images.map((src, index) => (
-                  <div key={index} className="flex-[0_0_100%] min-w-0 relative h-full">
+                {slides.map((slide) => (
+                  <div key={slide.id} className="flex-[0_0_100%] min-w-0 relative h-full group">
                     <img
-                      src={src}
-                      alt={`Slide ${index + 1}`}
-                      className="block h-full w-full object-cover"
+                      src={slide.image}
+                      alt={slide.title}
+                      className="block h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
+
+                    {/* Overlay Gradient & Text */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-10 text-white">
+                      <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <h3 className="text-2xl md:text-3xl font-bold mb-2 leading-tight">{slide.title}</h3>
+                        {slide.price > 0 && (
+                          <div className="flex items-center gap-3 mb-4">
+                            <span className="text-xl md:text-2xl font-bold text-primary-foreground bg-primary/90 px-3 py-1 rounded-md">
+                              ₹{slide.price}
+                            </span>
+                            {slide.description && (
+                              <span className="text-sm md:text-base text-gray-200 line-clamp-1">{slide.description}</span>
+                            )}
+                          </div>
+                        )}
+
+                        {slide.price > 0 && (
+                          <Button
+                            onClick={() => navigate(`/package/${slide.id}`)}
+                            className="w-full sm:w-auto bg-white text-black hover:bg-gray-100 font-bold transition-all"
+                          >
+                            Book Now <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Desktop Spotlight Card */}
+            {/* Desktop Spotlight Card - Only show if we used default slides (to avoid double marketing?) 
+                Or keep it as a neat overlay? User asked for "option to upload image... instead of some images only".
+                If we show the dynamic carousel, the spotlight card might be redundant if the carousel IS the spotlight.
+                Let's keep the Spotlight Card for now as it features the #1 Best Seller specifically, while carousel cycles.
+            */}
             <div className="hidden lg:block">
               <HeroSpotlight className="absolute -bottom-6 -left-6 w-[320px]" />
             </div>
+            {/* Mobile Spotlight Card - keep for mobile layout */}
+            <div className="absolute -bottom-[20px] left-4 right-4 lg:hidden z-20">
+              {/* We might want to hide HeroSpotlight on mobile here if it's already in the main flow text column?
+                   In the text column code above, `block lg:hidden mt-8` renders it. 
+                   So we don't need it positioned absolute here.
+               */}
+            </div>
           </div>
+
         </div>
-
-
       </div>
     </section>
   );

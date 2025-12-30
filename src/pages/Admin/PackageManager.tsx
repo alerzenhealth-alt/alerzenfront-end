@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Trash, Package, Pencil } from "lucide-react";
+import { Plus, Trash, Package, Pencil, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Test {
@@ -21,6 +21,7 @@ interface HealthPackage {
     price: number;
     originalPrice?: number;
     description?: string;
+    image_url?: string;
 }
 
 const PackageManager = () => {
@@ -34,6 +35,8 @@ const PackageManager = () => {
     const [originalPrice, setOriginalPrice] = useState<number>(0);
     const [selectedTests, setSelectedTests] = useState<string[]>([]);
     const [description, setDescription] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     // Search & Filter State
     const [searchTerm, setSearchTerm] = useState("");
@@ -70,6 +73,7 @@ const PackageManager = () => {
                     price: Number(p.price),
                     originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
                     description: p.description || "",
+                    image_url: (p as any).image_url || "",
                     promoCode: p.promo_code || "",
                     applyPromoToDisplayPrice: p.apply_promo_to_display_price || false
                 }));
@@ -128,7 +132,8 @@ const PackageManager = () => {
             deliveryTime: "24-48 hours",
             reportTime: "6-12 hours",
             promo_code: selectedPromoCode || null,
-            apply_promo_to_display_price: applyPromoToDisplayPrice
+            apply_promo_to_display_price: applyPromoToDisplayPrice,
+            image_url: imageUrl || null
         };
 
         try {
@@ -168,6 +173,7 @@ const PackageManager = () => {
         setPackageName(pkg.name);
         setPackagePrice(pkg.price);
         setOriginalPrice(pkg.originalPrice || 0);
+        setImageUrl(pkg.image_url || "");
 
         // Parse description for included tests
         let desc = pkg.description || "";
@@ -226,6 +232,7 @@ const PackageManager = () => {
         setSelectedPromoCode("");
         setApplyPromoToDisplayPrice(false);
         setSearchTerm("");
+        setImageUrl("");
     };
 
     const toggleTestSelection = (testId: string) => {
@@ -239,6 +246,40 @@ const PackageManager = () => {
         const test = availableTests.find(t => t.id === testId);
         return sum + (test?.price || 0);
     }, 0);
+
+
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setUploading(true);
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('package-images')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage
+                .from('package-images')
+                .getPublicUrl(filePath);
+
+            setImageUrl(data.publicUrl);
+            toast.success("Image uploaded!");
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            toast.error("Upload failed. Make sure 'package-images' bucket exists and is Public.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const filteredTests = availableTests.filter(test =>
         test.name.toLowerCase().includes(searchTerm.toLowerCase())
