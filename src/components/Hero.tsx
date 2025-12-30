@@ -4,7 +4,6 @@ import HeroSearchBar from "./HeroSearchBar";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
-import { HeroSpotlight } from "./HeroSpotlight";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -23,10 +22,8 @@ const Hero = () => {
     description: string;
   }>>([]);
   const [loading, setLoading] = useState(true);
-  const [showSpotlight, setShowSpotlight] = useState(true);
 
-  // Default fallback static images (just images, no text overlay logic for these in the mixed mode?)
-  // Actually, let's normalize them to the slide format so we can render them consistently.
+  // Default fallback static images
   const defaultSlides = [
     {
       id: "default-1",
@@ -53,26 +50,7 @@ const Hero = () => {
 
   useEffect(() => {
     fetchHeroPackages();
-    fetchSpotlightSettings();
   }, []);
-
-  const fetchSpotlightSettings = async () => {
-    try {
-      const { data } = await supabase
-        .from('site_settings')
-        .select('show_hero_spotlight')
-        .eq('id', 1)
-        .single();
-
-      if (data) {
-        // If column is missing or null, default to true
-        const setting = (data as any).show_hero_spotlight;
-        setShowSpotlight(setting !== false);
-      }
-    } catch (e) {
-      console.log("Error fetching spotlight settings", e);
-    }
-  };
 
   const fetchHeroPackages = async () => {
     try {
@@ -196,22 +174,6 @@ const Hero = () => {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Desktop Spotlight Card - Only show if we used default slides (to avoid double marketing?) 
-                Or keep it as a neat overlay? User asked for "option to upload image... instead of some images only".
-                If we show the dynamic carousel, the spotlight card might be redundant if the carousel IS the spotlight.
-                Let's keep the Spotlight Card for now as it features the #1 Best Seller specifically, while carousel cycles.
-            */}
-            <div className="hidden lg:block">
-              <HeroSpotlight className="absolute -bottom-6 -left-6 w-[320px]" />
-            </div>
-            {/* Mobile Spotlight Card - keep for mobile layout */}
-            <div className="absolute -bottom-[20px] left-4 right-4 lg:hidden z-20">
-              {/* We might want to hide HeroSpotlight on mobile here if it's already in the main flow text column?
-                   In the text column code above, `block lg:hidden mt-8` renders it. 
-                   So we don't need it positioned absolute here.
-               */}
             </div>
           </div>
 

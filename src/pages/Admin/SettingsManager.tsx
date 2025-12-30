@@ -27,19 +27,10 @@ const SettingsManager = () => {
     // Hero Banner State
     const [heroBannerText, setHeroBannerText] = useState("");
     const [isHeroBannerActive, setIsHeroBannerActive] = useState(false);
-    const [heroSpotlightId, setHeroSpotlightId] = useState<string>("");
-    const [showSpotlight, setShowSpotlight] = useState(true);
-    const [packages, setPackages] = useState<{ id: string, name: string }[]>([]);
 
     useEffect(() => {
         fetchSettings();
-        fetchPackages();
     }, []);
-
-    const fetchPackages = async () => {
-        const { data } = await supabase.from('tests').select('id, name').eq('category', 'Package');
-        if (data) setPackages(data);
-    };
 
     const fetchSettings = async () => {
         setLoading(true);
@@ -67,15 +58,6 @@ const SettingsManager = () => {
                 // Hero Banner
                 setIsHeroBannerActive(data.hero_banner_enabled || false);
                 setHeroBannerText(data.hero_banner_text || "");
-                // Use a try-catch for the new column in case it doesn't exist yet to prevent crash
-                try {
-                    setHeroSpotlightId((data as any).hero_spotlight_id || "");
-                    // Default to true if undefined (backward compatibility)
-                    const show = (data as any).show_hero_spotlight;
-                    setShowSpotlight(show !== false);
-                } catch (e) {
-                    console.log("Spotlight columns missing");
-                }
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
@@ -104,9 +86,7 @@ const SettingsManager = () => {
 
                     // Hero Banner
                     hero_banner_enabled: isHeroBannerActive,
-                    hero_banner_text: heroBannerText,
-                    hero_spotlight_id: heroSpotlightId || null,
-                    show_hero_spotlight: showSpotlight
+                    hero_banner_text: heroBannerText
                 })
                 .eq('id', 1);
 
@@ -196,47 +176,6 @@ const SettingsManager = () => {
                             placeholder="e.g. Reports in 6 hours!"
                             value={heroBannerText}
                             onChange={(e) => setHeroBannerText(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Hero Spotlight Card</CardTitle>
-                    <CardDescription>
-                        Select which package appears in the floating glass card on the homepage.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>Select Spotlight Package</Label>
-                        <select
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            value={heroSpotlightId}
-                            onChange={(e) => setHeroSpotlightId(e.target.value)}
-                        >
-                            <option value="">-- Automatic (Best Seller) --</option>
-                            {packages.map(pkg => (
-                                <option key={pkg.id} value={pkg.id}>
-                                    {pkg.name}
-                                </option>
-                            ))}
-                        </select>
-                        <p className="text-xs text-muted-foreground">
-                            If "Automatic" is selected, the system will show the package marked as "Popular".
-                        </p>
-                    </div>
-
-                    <div className="flex items-center justify-between space-x-2 border-t pt-4">
-                        <Label htmlFor="spotlight-visible" className="flex flex-col space-y-1">
-                            <span>Show Spotlight Card?</span>
-                            <span className="text-xs text-muted-foreground">Toggle this off to hide the floating card completely.</span>
-                        </Label>
-                        <Switch
-                            id="spotlight-visible"
-                            checked={showSpotlight}
-                            onCheckedChange={setShowSpotlight}
                         />
                     </div>
                 </CardContent>
