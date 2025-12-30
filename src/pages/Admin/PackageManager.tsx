@@ -272,8 +272,8 @@ const PackageManager = () => {
             setImageUrl(data.publicUrl);
             toast.success("Image uploaded!");
         } catch (error: any) {
-            console.error("Upload error:", error);
-            toast.error("Upload failed. Make sure 'package-images' bucket exists and is Public.");
+            console.error("Upload error details:", error);
+            toast.error(`Upload failed: ${error.message || error.error_description || "Check console for details"}`);
         } finally {
             setUploading(false);
         }
