@@ -28,6 +28,7 @@ const SettingsManager = () => {
     const [heroBannerText, setHeroBannerText] = useState("");
     const [isHeroBannerActive, setIsHeroBannerActive] = useState(false);
     const [heroSpotlightId, setHeroSpotlightId] = useState<string>("");
+    const [showSpotlight, setShowSpotlight] = useState(true);
     const [packages, setPackages] = useState<{ id: string, name: string }[]>([]);
 
     useEffect(() => {
@@ -69,8 +70,11 @@ const SettingsManager = () => {
                 // Use a try-catch for the new column in case it doesn't exist yet to prevent crash
                 try {
                     setHeroSpotlightId((data as any).hero_spotlight_id || "");
+                    // Default to true if undefined (backward compatibility)
+                    const show = (data as any).show_hero_spotlight;
+                    setShowSpotlight(show !== false);
                 } catch (e) {
-                    console.log("Spotlight column missing");
+                    console.log("Spotlight columns missing");
                 }
             }
         } catch (error) {
@@ -101,7 +105,8 @@ const SettingsManager = () => {
                     // Hero Banner
                     hero_banner_enabled: isHeroBannerActive,
                     hero_banner_text: heroBannerText,
-                    hero_spotlight_id: heroSpotlightId || null
+                    hero_spotlight_id: heroSpotlightId || null,
+                    show_hero_spotlight: showSpotlight
                 })
                 .eq('id', 1);
 
@@ -221,6 +226,18 @@ const SettingsManager = () => {
                         <p className="text-xs text-muted-foreground">
                             If "Automatic" is selected, the system will show the package marked as "Popular".
                         </p>
+                    </div>
+
+                    <div className="flex items-center justify-between space-x-2 border-t pt-4">
+                        <Label htmlFor="spotlight-visible" className="flex flex-col space-y-1">
+                            <span>Show Spotlight Card?</span>
+                            <span className="text-xs text-muted-foreground">Toggle this off to hide the floating card completely.</span>
+                        </Label>
+                        <Switch
+                            id="spotlight-visible"
+                            checked={showSpotlight}
+                            onCheckedChange={setShowSpotlight}
+                        />
                     </div>
                 </CardContent>
             </Card>

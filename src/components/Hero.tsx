@@ -23,6 +23,7 @@ const Hero = () => {
     description: string;
   }>>([]);
   const [loading, setLoading] = useState(true);
+  const [showSpotlight, setShowSpotlight] = useState(true);
 
   // Default fallback static images (just images, no text overlay logic for these in the mixed mode?)
   // Actually, let's normalize them to the slide format so we can render them consistently.
@@ -52,19 +53,44 @@ const Hero = () => {
 
   useEffect(() => {
     fetchHeroPackages();
+    fetchSpotlightSettings();
   }, []);
+
+  const fetchSpotlightSettings = async () => {
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('show_hero_spotlight')
+        .eq('id', 1)
+        .single();
+
+      if (data) {
+        // If column is missing or null, default to true
+        const setting = (data as any).show_hero_spotlight;
+        setShowSpotlight(setting !== false);
+      }
+    } catch (e) {
+      console.log("Error fetching spotlight settings", e);
+    }
+  };
 
   const fetchHeroPackages = async () => {
     try {
-      const { data } = await supabase
+      // Relaxed query to match "Package", "Health Package", "package" etc.
+      const { data, error } = await supabase
         .from('tests')
         .select('*')
-        .eq('category', 'Package')
+        .ilike('category', '%Package%')
         .order('created_at', { ascending: false });
 
+      if (error) {
+        console.error("Supabase Error fetching slides:", error);
+      }
+
       if (data) {
+        // Filter locally for image existence to be safe
         const validSlides = data
-          .filter(pkg => (pkg as any).image_url) // Only show if they have an image
+          .filter(pkg => (pkg as any).image_url)
           .map(pkg => ({
             id: pkg.id,
             image: (pkg as any).image_url,
@@ -76,6 +102,7 @@ const Hero = () => {
         if (validSlides.length > 0) {
           setSlides(validSlides);
         } else {
+          // If no custom images, fallback
           setSlides(defaultSlides);
         }
       } else {
