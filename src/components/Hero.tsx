@@ -9,6 +9,7 @@ import { openWhatsApp } from "@/lib/whatsapp";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
+import { HeroSpotlight } from "./HeroSpotlight";
 
 const Hero = () => {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 4000 })]);
@@ -49,6 +50,10 @@ const Hero = () => {
                 NABL Labs
               </div>
             </div>
+            {/* Mobile Spotlight Card */}
+            <div className="block lg:hidden mt-8">
+              <HeroSpotlight className="w-full" />
+            </div>
           </div>
 
           {/* Hero Carousel - Order 1 on mobile, Order 2 on desktop */}
@@ -67,8 +72,15 @@ const Hero = () => {
                 ))}
               </div>
             </div>
+
+            {/* Desktop Spotlight Card */}
+            <div className="hidden lg:block">
+              <HeroSpotlight className="absolute -bottom-6 -left-6 w-[320px]" />
+            </div>
           </div>
         </div>
+
+
       </div>
     </section>
   );
