@@ -247,8 +247,6 @@ const PackageManager = () => {
         return sum + (test?.price || 0);
     }, 0);
 
-
-
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
             const file = e.target.files?.[0];
@@ -308,6 +306,38 @@ const PackageManager = () => {
                             <div className="space-y-2">
                                 <Label>Description (Optional base text)</Label>
                                 <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Marketing blurb..." />
+                            </div>
+                        </div>
+
+                        {/* Image Upload Block */}
+                        <div className="space-y-2">
+                            <Label>Package Banner Image (for Hero Carousel)</Label>
+                            <div className="flex items-center gap-4">
+                                {imageUrl && (
+                                    <div className="relative w-20 h-20 rounded-md overflow-hidden border">
+                                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <button
+                                            onClick={() => setImageUrl("")}
+                                            className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-md hover:bg-red-600"
+                                            title="Remove image"
+                                            type="button"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                )}
+                                <div className="flex-1">
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={uploading}
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Upload a landscape image (e.g. 1200x600) for the homepage slider.
+                                    </p>
+                                    {uploading && <p className="text-xs text-blue-500 animate-pulse">Uploading...</p>}
+                                </div>
                             </div>
                         </div>
 
