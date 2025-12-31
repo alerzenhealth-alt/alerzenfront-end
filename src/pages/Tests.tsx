@@ -97,8 +97,9 @@ const Tests = () => {
             <section className="pt-32 pb-12 md:pt-40 md:pb-16 bg-transparent relative">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     {/* Partner Logo */}
-                    <div className="absolute top-0 right-4 md:right-8 animate-fade-in opacity-90 hover:opacity-100 transition-opacity">
-                        <img src={primaLogo} alt="Powered by Prima Diagnostics" className="h-12 md:h-16 w-auto drop-shadow-sm" />
+                    {/* Partner Logo */}
+                    <div className="flex justify-center mb-6 md:absolute md:top-0 md:right-8 md:mb-0 animate-fade-in opacity-90 hover:opacity-100 transition-opacity">
+                        <img src={primaLogo} alt="Powered by Prima Diagnostics" className="h-10 md:h-16 w-auto drop-shadow-sm" />
                     </div>
 
                     <div className="text-center space-y-6 animate-fade-in">
