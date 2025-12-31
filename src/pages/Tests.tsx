@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Search, CheckCircle, Clock, TestTube, ArrowRight } from "lucide-react";
+import primaLogo from "@/assets/prima_logo.png";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { supabase } from "@/integrations/supabase/client";
 import BookingCheckout from "@/components/BookingCheckout";
@@ -95,6 +96,11 @@ const Tests = () => {
             {/* Hero Section */}
             <section className="pt-32 pb-12 md:pt-40 md:pb-16 bg-transparent relative">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    {/* Partner Logo */}
+                    <div className="absolute top-0 right-4 md:right-8 animate-fade-in opacity-90 hover:opacity-100 transition-opacity">
+                        <img src={primaLogo} alt="Powered by Prima Diagnostics" className="h-12 md:h-16 w-auto drop-shadow-sm" />
+                    </div>
+
                     <div className="text-center space-y-6 animate-fade-in">
                         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-[#0b3c65] drop-shadow-sm tracking-tight">
                             Lab <span className="text-[#be2c2d]">Tests</span>
