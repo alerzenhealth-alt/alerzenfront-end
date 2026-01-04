@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings, FileText, QrCode } from "lucide-react";
+import { toast } from "sonner";
 import TestManager from "./TestManager";
 import PackageManager from "./PackageManager";
 import PromoCodeManager from "./PromoCodeManager";
 import SettingsManager from "./SettingsManager";
 import PDFEditor from "./PDFEditor";
 import QRGenerator from "./QRGenerator";
+import AdminManager from "./AdminManager";
+import TwoFactorSetup from "./TwoFactorSetup";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -84,6 +87,13 @@ const AdminDashboard = () => {
                     >
                         <Settings className="w-4 h-4 mr-2" /> Site Settings
                     </Button>
+                    <Button
+                        variant={activeTab === "admins" ? "secondary" : "ghost"}
+                        className="w-full justify-start font-medium"
+                        onClick={() => setActiveTab("admins")}
+                    >
+                        <Users className="w-4 h-4 mr-2" /> Admin Access
+                    </Button>
                 </nav>
 
                 <Button variant="outline" className="mt-auto flex items-center gap-2 text-destructive hover:text-destructive" onClick={handleLogout}>
@@ -100,6 +110,12 @@ const AdminDashboard = () => {
                 {activeTab === "pdf" && <PDFEditor />}
                 {activeTab === "slides" && <div className="text-center text-gray-500 mt-20">Slideshow Manager Coming Soon</div>}
                 {activeTab === "settings" && <SettingsManager />}
+                {activeTab === "admins" && (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <AdminManager />
+                        <TwoFactorSetup />
+                    </div>
+                )}
             </div>
         </div>
     );
