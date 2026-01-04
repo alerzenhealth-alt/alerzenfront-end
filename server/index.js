@@ -73,33 +73,48 @@ app.get('/api/2fa/setup', async (req, res) => {
 
 // login
 app.post('/api/login', async (req, res) => {
-    const { username, password, token } = req.body; // 'username' is actually email in Supabase
+    const { username, password, token } = req.body;
 
-    const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
+    console.log(`[Login Attempt] User: ${username}`);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
         email: username,
         password: password
     });
 
-    if (error || !user) {
-        return res.status(401).json({ success: false, message: "Invalid credentials" });
+    if (error) {
+        console.error("[Login Error] Supabase Auth Failed:", error.message);
+        return res.status(401).json({ success: false, message: error.message });
     }
 
+    if (!data.user || !data.session) {
+        console.error("[Login Error] No session returned. Email confirmed?");
+        return res.status(401).json({ success: false, message: "Login successful but no session. Please confirm your email." });
+    }
+
+    const user = data.user;
+    const session = data.session;
+
     // 2. Check 2FA
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('two_factor_secret')
         .eq('id', user.id)
         .single();
 
-    if (!profile || !profile.two_factor_secret) {
+    // If table doesn't exist or error fetching profile, treat as "2FA Not Set Up"
+    // This allows the first login to proceed
+    if (profileError || !profile || !profile.two_factor_secret) {
+        console.log(`[Login Success] 2FA not set up for ${username}`);
         return res.json({
             success: true,
             token: session.access_token,
-            warning: "2FA not set up. Please visit /api/2fa/setup"
+            warning: "2FA not set up. Please visit the Admin Access tab to configure it."
         });
     }
 
     if (!token) {
+        console.log(`[Login Challenge] 2FA Token required for ${username}`);
         return res.json({ success: false, require2fa: true, message: "2FA Code Required" });
     }
 
@@ -110,8 +125,10 @@ app.post('/api/login', async (req, res) => {
     });
 
     if (verified) {
+        console.log(`[Login Success] 2FA Verified for ${username}`);
         res.json({ success: true, token: session.access_token });
     } else {
+        console.warn(`[Login Fail] Invalid 2FA Token for ${username}`);
         res.status(401).json({ success: false, message: "Invalid 2FA Code" });
     }
 });
