@@ -15,11 +15,15 @@ export default function TwoFactorSetup() {
         setLoading(true);
         // Call our backend API to generate the secret
         // Note: We need the session token
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            toast.error("Please log in first");
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error || !data?.session) {
+            toast.error("Please log in first (No Session)");
+            setLoading(false);
             return;
         }
+
+        const session = data.session;
 
         try {
             const res = await fetch('http://localhost:3000/api/2fa/setup', {

@@ -20,8 +20,12 @@ export default function AdminManager() {
     }, []);
 
     const getCurrentUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        setCurrentUser(user);
+        const { data, error } = await supabase.auth.getUser();
+        if (data?.user) {
+            setCurrentUser(data.user);
+        } else {
+            console.error("Failed to get user:", error);
+        }
     };
 
     const fetchAdmins = async () => {
