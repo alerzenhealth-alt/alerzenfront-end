@@ -11,7 +11,7 @@ const db = new Low(adapter, {
     tests: [],
     promoCodes: [],
     slides: [],
-    admin: { username: "admin", password: "password123" } // Default admin credentials
+    admin: { username: "admin", twoFactorSecret: null }
 });
 
 // Initialize DB
@@ -23,7 +23,7 @@ db.data ||= {
     packages: [],
     promoCodes: [],
     slides: [],
-    admin: { username: "admin", password: "password123" }
+    admin: { username: "admin", twoFactorSecret: null } // Password handled via env
 };
 await db.write();
 console.log("DB Initialized.");
