@@ -20,7 +20,10 @@ export default function AdminManager() {
     }, []);
 
     const getCurrentUser = async () => {
-        const { data, error } = await supabase.auth.getUser();
+        const token = localStorage.getItem("adminToken");
+        if (!token) return;
+
+        const { data, error } = await supabase.auth.getUser(token);
         if (data?.user) {
             setCurrentUser(data.user);
         } else {
