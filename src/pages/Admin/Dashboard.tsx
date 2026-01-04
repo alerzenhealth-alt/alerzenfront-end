@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings, FileText, QrCode } from "lucide-react";
+import { LogOut, LayoutDashboard, TestTube, Package, Tag, Image, Settings, FileText, QrCode, Users } from "lucide-react";
 import { toast } from "sonner";
 import TestManager from "./TestManager";
 import PackageManager from "./PackageManager";
