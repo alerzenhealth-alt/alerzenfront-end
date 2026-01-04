@@ -12,6 +12,17 @@ import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 import { createClient } from '@supabase/supabase-js';
 
+// Initialize Supabase Client (Admin Context)
+// Note: In Node.js, we use VITE_ prefixed vars because that's what's in the .env file shared with frontend
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    console.warn("Supabase URL or Key missing in environment variables. Auth will fail.");
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
