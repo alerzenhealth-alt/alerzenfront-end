@@ -17,6 +17,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FAQ from "./pages/FAQ";
 import Connect from "./pages/Connect";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +43,14 @@ const App = () => (
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element={
+            <div className="admin-boundary">
+              {/* Lazy load boundary for admin */}
+              <ErrorBoundary>
+                <AdminDashboard />
+              </ErrorBoundary>
+            </div>
+          } />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
