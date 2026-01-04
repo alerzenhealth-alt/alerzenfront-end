@@ -73,26 +73,28 @@ app.get('/api/2fa/setup', async (req, res) => {
 
 // login
 app.post('/api/login', async (req, res) => {
-    const { username, password, token } = req.body;
+    const { username, password, token } = req.body; // 'username' is actually email in Supabase
 
-    const envUser = process.env.ADMIN_USERNAME || "admin";
-    const envPass = process.env.ADMIN_PASSWORD || "password123";
+    const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
+    });
 
-    // 1. Check Basic Credentials
-    if (username !== envUser || password !== envPass) {
+    if (error || !user) {
         return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     // 2. Check 2FA
-    await db.read();
-    const userSecret = db.data.admin.twoFactorSecret;
+    const { data: profile } = await supabase
+        .from('admin_profiles')
+        .select('two_factor_secret')
+        .eq('id', user.id)
+        .single();
 
-    if (!userSecret) {
-        // If 2FA not set up yet, allow login but warn (or Block). 
-        // For now, allow to let them setup.
+    if (!profile || !profile.two_factor_secret) {
         return res.json({
             success: true,
-            token: process.env.ADMIN_SESSION_SECRET || "secure-token-changeme",
+            token: session.access_token,
             warning: "2FA not set up. Please visit /api/2fa/setup"
         });
     }
@@ -102,13 +104,13 @@ app.post('/api/login', async (req, res) => {
     }
 
     const verified = speakeasy.totp.verify({
-        secret: userSecret,
+        secret: profile.two_factor_secret,
         encoding: 'base32',
         token: token
     });
 
     if (verified) {
-        res.json({ success: true, token: process.env.ADMIN_SESSION_SECRET || "secure-token-changeme" });
+        res.json({ success: true, token: session.access_token });
     } else {
         res.status(401).json({ success: false, message: "Invalid 2FA Code" });
     }
