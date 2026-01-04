@@ -10,27 +10,31 @@ import multer from 'multer';
 import csv from 'csv-parser';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
+import { createClient } from '@supabase/supabase-js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Security Middleware
-const isAuthenticated = (req, res, next) => {
-    // Skip auth for login and public endpoints
-    if (req.path === '/api/login' || req.path === '/api/2fa/setup' || req.path === '/api/2fa/verify') {
-        return next();
-    }
+// Security Middleware (Supabase JWT)
+const isAuthenticated = async (req, res, next) => {
+    if (req.path === '/api/login') return next();
 
-    // Check for Admin Token in Headers
     const authHeader = req.headers.authorization;
-    const adminToken = process.env.ADMIN_SESSION_SECRET || "secure-token-changeme";
+    if (!authHeader) return res.status(401).json({ success: false, message: "No token provided" });
 
-    if (authHeader === `Bearer ${adminToken}`) {
-        return next();
+    const token = authHeader.replace('Bearer ', '');
+
+    // Verify with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+        return res.status(401).json({ success: false, message: "Invalid Token" });
     }
 
-    return res.status(401).json({ success: false, message: "Unauthorized Access" });
+    req.user = user;
+    next();
 };
 
 app.use(cors());
