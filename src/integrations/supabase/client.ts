@@ -5,10 +5,16 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.warn("Supabase URL or Key missing. Auth features will fail.");
+}
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+// Fallback to avoid crash if keys are missing
+// We use a dummy URL if missing so createClient doesn't throw at top-level
+const validUrl = SUPABASE_URL || "https://placeholder.supabase.co";
+const validKey = SUPABASE_PUBLISHABLE_KEY || "placeholder-key";
+
+export const supabase = createClient<Database>(validUrl, validKey, {
   auth: {
     storage: localStorage,
     persistSession: true,
