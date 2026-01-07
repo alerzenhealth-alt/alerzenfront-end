@@ -281,8 +281,11 @@ const HeroSearchBar = () => {
 
         {/* Glass Suggestions Dropdown */}
         {showSuggestions && filteredTests.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-3 glass-card !bg-white rounded-2xl shadow-2xl z-[100] overflow-hidden animate-fade-in border border-white/50">
-            <ul className="py-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+          <div
+            className="absolute top-full left-0 right-0 mt-3 glass-card !bg-white rounded-2xl shadow-2xl z-[100] overflow-hidden animate-fade-in border border-white/50"
+            onMouseDown={(e) => e.preventDefault()} // Prevent input blur when clicking scrollbar or container
+          >
+            <ul className="py-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
               {filteredTests.map((test, index) => {
                 const hasDiscount = test.originalPrice && test.originalPrice > test.price;
                 const discountPercentage = hasDiscount
@@ -293,7 +296,7 @@ const HeroSearchBar = () => {
                   <li key={index}>
                     <button
                       className="w-full px-5 py-3.5 text-left hover:bg-primary/5 transition-all flex items-center justify-between gap-3 group"
-                      onMouseDown={() => addToCart(test)}
+                      onClick={() => addToCart(test)} // Changed from onMouseDown to onClick for better mobile support
                     >
                       <div className="flex-1 min-w-0">
                         <span className="text-gray-800 font-medium group-hover:text-primary transition-colors block truncate">
