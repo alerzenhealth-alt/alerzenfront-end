@@ -301,7 +301,7 @@ const HeroSearchBar = () => {
             className="absolute top-full left-0 right-0 mt-3 glass-card !bg-white rounded-2xl shadow-2xl z-[100] overflow-hidden animate-fade-in border border-white/50"
           >
             <ul
-              className="py-2 max-h-[60vh] overflow-y-auto custom-scrollbar"
+              className="py-2 max-h-[450px] overflow-y-auto custom-scrollbar"
               style={{ overscrollBehavior: 'contain' }}
             >
               {filteredTests.map((test, index) => {
