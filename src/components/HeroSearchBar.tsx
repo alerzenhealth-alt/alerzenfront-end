@@ -31,8 +31,25 @@ const HeroSearchBar = () => {
   const [allTests, setAllTests] = useState<LabTest[]>([]);
   const [loading, setLoading] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchTests();
@@ -229,7 +246,7 @@ const HeroSearchBar = () => {
   };
 
   return (
-    <div className="w-full relative z-50">
+    <div className="w-full relative z-50" ref={wrapperRef}>
       {/* Glass Search Bar */}
       <div className="relative flex items-center glass rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-16 border border-white/40 z-[101]">
         <div className="flex-1 flex items-center h-full">
@@ -243,7 +260,6 @@ const HeroSearchBar = () => {
               setShowSuggestions(true);
             }}
             onFocus={() => setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base placeholder:text-gray-500 h-full px-4 text-gray-800 font-medium"
           />
         </div>
@@ -283,9 +299,11 @@ const HeroSearchBar = () => {
         {showSuggestions && filteredTests.length > 0 && (
           <div
             className="absolute top-full left-0 right-0 mt-3 glass-card !bg-white rounded-2xl shadow-2xl z-[100] overflow-hidden animate-fade-in border border-white/50"
-            onMouseDown={(e) => e.preventDefault()} // Prevent input blur when clicking scrollbar or container
           >
-            <ul className="py-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <ul
+              className="py-2 max-h-[60vh] overflow-y-auto custom-scrollbar"
+              style={{ overscrollBehavior: 'contain' }}
+            >
               {filteredTests.map((test, index) => {
                 const hasDiscount = test.originalPrice && test.originalPrice > test.price;
                 const discountPercentage = hasDiscount
