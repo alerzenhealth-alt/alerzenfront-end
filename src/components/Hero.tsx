@@ -95,7 +95,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 bg-white overflow-hidden">
+    <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
