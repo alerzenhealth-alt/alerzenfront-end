@@ -4,7 +4,7 @@ import './PDFEditor.css';
 import PDFPreview from './components/PDFPreview';
 import ErrorBoundary from './components/ErrorBoundary';
 import { generatePDF } from './utils/pdfProcessor';
-import defaultLogoPath from '@/assets/default_logo.png';
+import { defaultLogoBase64 } from './defaultLogoData';
 
 // Components Placeholder
 const PDFUploader = ({ onUpload }: { onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void }) => (
@@ -45,15 +45,15 @@ const PDFEditor = () => {
     useEffect(() => {
         const loadDefaults = async () => {
             try {
-                // Load Default Logo
-                const logoRes = await fetch(defaultLogoPath);
-                if (logoRes.ok) {
-                    const logoBlob = await logoRes.blob();
-                    const logoFile = new File([logoBlob], "default_logo.png", { type: "image/png" });
-                    setLogoFile(logoFile);
-                    setLogoUrl(URL.createObjectURL(logoFile));
+                // Load Default Logo from Base64
+                if (defaultLogoBase64) {
+                    const res = await fetch(defaultLogoBase64);
+                    const blob = await res.blob();
+                    const file = new File([blob], "default_logo.png", { type: "image/png" });
+                    setLogoFile(file);
+                    setLogoUrl(defaultLogoBase64);
                 } else {
-                    console.warn("Default logo not found");
+                    console.warn("Default logo data missing");
                 }
 
                 // Load Default Watermark (Image)
