@@ -4,6 +4,7 @@ import './PDFEditor.css';
 import PDFPreview from './components/PDFPreview';
 import ErrorBoundary from './components/ErrorBoundary';
 import { generatePDF } from './utils/pdfProcessor';
+import defaultLogoPath from '@/assets/default_logo.png';
 
 // Components Placeholder
 const PDFUploader = ({ onUpload }: { onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void }) => (
@@ -45,7 +46,7 @@ const PDFEditor = () => {
         const loadDefaults = async () => {
             try {
                 // Load Default Logo
-                const logoRes = await fetch('/assets/pdf-editor/default_logo.png');
+                const logoRes = await fetch(defaultLogoPath);
                 if (logoRes.ok) {
                     const logoBlob = await logoRes.blob();
                     const logoFile = new File([logoBlob], "default_logo.png", { type: "image/png" });
