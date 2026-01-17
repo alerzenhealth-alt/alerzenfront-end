@@ -57,13 +57,19 @@ const PDFEditor = () => {
                 }
 
                 // Load Default Watermark (Image)
-                const wmRes = await fetch('/assets/pdf-editor/default_watermark.png');
-                if (wmRes.ok) {
-                    const wmBlob = await wmRes.blob();
-                    const wmFile = new File([wmBlob], "default_watermark.png", { type: "image/png" });
-                    setWatermarkFile(wmFile);
-                    setWatermarkUrl(URL.createObjectURL(wmFile));
-                    setWatermarkType('image'); // Only set type if successful
+                try {
+                    const wmRes = await fetch('/watermark.png');
+                    if (wmRes.ok) {
+                        const wmBlob = await wmRes.blob();
+                        const wmFile = new File([wmBlob], "default_watermark.png", { type: "image/png" });
+                        setWatermarkFile(wmFile);
+                        setWatermarkUrl(URL.createObjectURL(wmFile));
+                        setWatermarkType('image'); // Only set type if successful
+                    } else {
+                        console.warn("Default watermark image not found at /watermark.png");
+                    }
+                } catch (wmErr) {
+                    console.warn("Failed to load default watermark:", wmErr);
                 }
 
                 // Set default positions (optional tweaking)
@@ -137,9 +143,9 @@ const PDFEditor = () => {
                 positions,
                 options
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error("Export failed:", error);
-            alert("Failed to export PDF. Check console.");
+            alert(`Failed to export PDF: ${error.message || "Unknown error"}. Check console for details.`);
         } finally {
             setIsProcessing(false);
         }
