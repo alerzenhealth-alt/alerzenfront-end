@@ -9,7 +9,7 @@ const FAQ = () => {
     const faqs = [
         {
             question: "How do I book a home blood test?",
-            answer: "You can book directly through our website by selecting your test and clicking 'Book Now', which opens WhatsApp for quick confirmation. Or simply call us at +91 9876543210."
+            answer: "You can book directly through our website by selecting your test and clicking 'Book Now', which opens WhatsApp for quick confirmation. Or simply call us at +91 99864 04073."
         },
         {
             question: "Is home sample collection free?",

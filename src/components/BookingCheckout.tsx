@@ -205,7 +205,7 @@ Please schedule my home sample collection.`;
                             <Input
                                 id="phone"
                                 name="phone"
-                                placeholder="9876543210"
+                                placeholder="99864 04073"
                                 type="tel"
                                 value={formData.phone}
                                 onChange={handleInputChange}

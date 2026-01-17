@@ -154,7 +154,7 @@ Please confirm my booking.
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Phone Number *</Label>
-                                        <Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 9876543210" />
+                                        <Input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 99864 04073" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Age</Label>
